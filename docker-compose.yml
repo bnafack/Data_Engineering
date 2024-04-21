@@ -1,0 +1,82 @@
+version: "3.6"
+services:
+  postgres:
+    build: postgres-with-pgloader
+    container_name: postgres-env
+
+    restart: always
+    volumes:
+      # - ./pgload/:/root
+      - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: root
+      POSTGRES_USER: root
+      POSTGRES_DB: dev
+    networks:
+      - internet
+    ports:
+      - 5438:5432
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4_container
+    restart: always
+    ports:
+      - "8888:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: bauricenafack@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: superadmin
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    networks:
+      - internet
+
+  sqlite3:
+    image: nouchka/sqlite3:latest
+    container_name: sqlite
+    stdin_open: true
+    restart: always
+    tty: true
+    volumes:
+      - ./sqlitedb/:/root/db/
+    networks:
+      - internet
+
+  mysql:
+    image: mysql:5.7
+    container_name: mysql-db
+    restart: always
+    ports:
+      - 3307:3306
+    volumes:
+      - /var/lib/mysql
+      - ./database:/docker-entrypoint-initdb.d
+      - ./test_db/:/home
+    environment:
+      MYSQL_DATABASE: "dev"
+      MYSQL_USER: "superadmin"
+      MYSQL_PASSWORD: "superadmin"
+      MYSQL_ROOT_PASSWORD: "root"
+    networks:
+      - internet
+
+  adminer:
+    image: adminer
+    container_name: admirer-db
+    restart: always
+    networks:
+      - internet
+    ports:
+      - 8080:8080
+    depends_on:
+      - mysql
+      - postgres
+      - sqlite3
+
+networks:
+  internet:
+    driver: bridge
+
+volumes:
+  local_pgdata:
+  pgadmin-data:
+  db_data:
