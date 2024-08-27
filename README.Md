@@ -22,6 +22,8 @@ each VPC belong to the region belonging to one or more available zone
 
 * Classless inter-domain Routing (CIDR)[cidr.xyz]: Notation for Describing blocks of IP addresses assigned in the vpc level
 
-![https://www.youtube.com/watch?v=7_NNlnH7sAg](cidr.png)
+![](cidr.png) (https://www.youtube.com/watch?v=7_NNlnH7sAg)
 The diagram has 6 EC2 instances, each requiring its IP address. If we add a database, it will also need an IP address. Therefore, ensuring that our VPC has enough available IP addresses is important. To do this, we need to define a net mask that will provide an adequate number of IP addresses.
 * Internet gateway: The public subnet has a route to it, the private subnet does not have that route, we can't get to it from the internet, or we can't get to it out to the internet. How to get to the internet in case we need to update the patch or download a file from the internet? we don't want the outside world to get into it, but we want it to get access to the internet, in that context, we have to use the NAT Getaway (NAT: Network access translation), for this, we have to create a NAT gateway in the public subnet and add the route from the private subnet to its, then add the route from the nat gateway to the internet gateway and from it to internet. That is how we enable private resources to get internet access. 
+
+![](NAT.png)
