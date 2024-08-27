@@ -21,3 +21,5 @@ where first_name = 'Alain' and gender='M' and emp_no>=654161;`
 each VPC belong to the region belonging to one or more available zone 
 
 * Classless inter-domain Routing (CIDR): Notation for Describing blocks of IP addresses assigned in the vpc level
+
+![](cidr.png)
