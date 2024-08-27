@@ -20,7 +20,8 @@ where first_name = 'Alain' and gender='M' and emp_no>=654161;`
 * Each subnet in a VPC has an associated route table. A subnet is considered public if routed to the internet via an internet gateway. 
 each VPC belong to the region belonging to one or more available zone 
 
-* Classless inter-domain Routing (CIDR): Notation for Describing blocks of IP addresses assigned in the vpc level
+* Classless inter-domain Routing (CIDR)[cidr.xyz]: Notation for Describing blocks of IP addresses assigned in the vpc level
 
 ![https://www.youtube.com/watch?v=7_NNlnH7sAg](cidr.png)
-In the diagram above, we have 6 EC2 instances, which will take up 6 IP addresses, if we add a database, they will need the IP address, so we have to make sure we have enough IP addresses for our VPC, for a given available IP address, we have to define a mask that will be us enough IP.
+The diagram has 6 EC2 instances, each requiring its IP address. If we add a database, it will also need an IP address. Therefore, ensuring that our VPC has enough available IP addresses is important. To do this, we need to define a net mask that will provide an adequate number of IP addresses.
+* Internet gateway: The public subnet has a route to it, the private subnet does not have that route, we can't get to it from the internet, or we can't get to it out to the internet. How to get to the internet in case we need to update the patch or download a file from the internet? we don't want the outside world to get into it, but we want it to get access to the internet, in that context, we have to use the NAT Getaway (NAT: Network access translation), for this, we have to create a NAT gateway in the public subnet and add the route from the private subnet to its, then add the route from the nat gateway to the internet gateway and from it to internet. That is how we enable private resources to get internet access. 
