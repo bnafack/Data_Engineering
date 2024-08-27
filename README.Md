@@ -14,6 +14,8 @@ where first_name = 'Alain' and gender='M' and emp_no>=654161;`
 ## Virtual Private Cloud (VPC)
 * Your private cloud/network within the cloud
 * Isolates your resources from everyone else's
+the idea behind VPC:  
+for a given AWS account, we have a region, in the region, we may have an availability zone, which is an item in the region, or 2 to many data centres in the same region,  we may launch into each availability zone, an EC2 instance, RDS instance or other things, we may split these instance in availability zone in case of failure. A VPC is an isolated network in a region, then create a VPC, we choose a region and decide we want to spend in our availability zone, 
 
 * Networking 
 
