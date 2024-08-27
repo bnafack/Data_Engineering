@@ -22,4 +22,5 @@ each VPC belong to the region belonging to one or more available zone
 
 * Classless inter-domain Routing (CIDR): Notation for Describing blocks of IP addresses assigned in the vpc level
 
-![](cidr.png)
+![https://www.youtube.com/watch?v=7_NNlnH7sAg](cidr.png)
+In the diagram above, we have 6 EC2 instances, which will take up 6 IP addresses, if we add a database, they will need the IP address, so we have to make sure we have enough IP addresses for our VPC, for a given available IP address, we have to define a mask that will be us enough IP.
