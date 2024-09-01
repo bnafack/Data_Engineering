@@ -31,8 +31,18 @@ The diagram has 6 EC2 instances, each requiring its IP address. If we add a data
 ![](NAT.png)
 
 * Network ACLS and Security Groups: how to secure everything
-- Network ACL is a firewall that controls traffic in/out of a subnet, it has rules for allow and deny. Rules include IP addresses only
+- Network ACL is a firewall that controls traffic in/out of a subnet, with rules for allow and deny. Rules include IP addresses only
 - Security groups: Firewall that controls traffic in/out of an EC2 instance, it only has rules to allow, Rules include IP addresses and other security groups
 
 ![](Nacls.png)
+
+
+# Connect to EC2 instance using ssh. 
+## If the following error occurs:  
+`Permissions 0664 for 'connect_baurice.pem' are too open.
+It is required that your private key files are NOT accessible by others.
+This private key will be ignored.
+`
+
+solution>  sudo chmod 400 connect_baurice.pem , after this, the ssh connection should work
 
