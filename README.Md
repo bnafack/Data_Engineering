@@ -50,6 +50,10 @@ This private key will be ignored.
 
 solution>  sudo chmod 400 connect_baurice.pem , after this, the ssh connection should work
 
+# Connect to RDS in AWS for Ubuntu
+`psql --host=database-1-instance-1.ppppp.eu-west-1.rds.amazonaws.com --port=5432 --dbname=postgres --username=postgres
+`
+
 
 ## References: 
 [Security Groups and Network Access Control Lists (ACL)](https://www.youtube.com/watch?v=Qrg0gsehllY)
