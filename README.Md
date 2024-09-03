@@ -50,3 +50,6 @@ This private key will be ignored.
 
 solution>  sudo chmod 400 connect_baurice.pem , after this, the ssh connection should work
 
+
+## References: 
+[Security Groups and Network Access Control Lists (ACL)](https://www.youtube.com/watch?v=Qrg0gsehllY)
