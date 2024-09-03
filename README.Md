@@ -37,6 +37,10 @@ The diagram has 6 EC2 instances, each requiring its IP address. If we add a data
 ![](Nacls.png)
 
 
+![](security.png)
+
+
+
 # Connect to EC2 instance using ssh. 
 ## If the following error occurs:  
 `Permissions 0664 for 'connect_baurice.pem' are too open.
