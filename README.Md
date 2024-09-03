@@ -31,8 +31,8 @@ The diagram has 6 EC2 instances, each requiring its IP address. If we add a data
 ![](NAT.png)
 
 * Network ACLS and Security Groups: how to secure everything
-- Network ACL is a firewall that controls traffic in/out of a subnet, with rules for allow and deny. Rules include IP addresses only
-- Security groups: Firewall that controls traffic in/out of an EC2 instance, it only has rules to allow, Rules include IP addresses and other security groups
+- Network ACL is a firewall that controls traffic in/out of a subnet, with rules for allow and deny. Rules include IP addresses only. It is applied in the subnet level, it's also stateless
+- Security groups: Firewall that controls traffic in/out of an EC2 instance, it only has rules to allow, Rules include IP addresses and other security groups. A security group is stateful.  
 
 ![](Nacls.png)
 
