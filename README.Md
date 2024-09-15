@@ -57,6 +57,7 @@ solution>  sudo chmod 400 connect_baurice.pem , after this, the ssh connection s
 ## Mount S3 into EC2 instance
 
 [install Installing Mountpoint - Amazon Simple Storage Service](https://docs.aws.amazon.com/AmazonS3/latest/userguide/mountpoint-installation.html)
+[mountpointS3 github](https://github.com/awslabs/mountpoint-s3?tab=readme-ov-file)
 
 to mount :  mount-s3 bucketname localpath/
 
