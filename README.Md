@@ -54,6 +54,8 @@ solution>  sudo chmod 400 connect_baurice.pem , after this, the ssh connection s
 `psql --host=database-1-instance-1.ppppp.eu-west-1.rds.amazonaws.com --port=5432 --dbname=postgres --username=postgres
 `
 
+# Load Balancer
+
 ## Mount S3 into EC2 instance
 
 [install Installing Mountpoint - Amazon Simple Storage Service](https://docs.aws.amazon.com/AmazonS3/latest/userguide/mountpoint-installation.html)
