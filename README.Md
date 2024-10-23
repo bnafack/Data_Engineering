@@ -56,6 +56,8 @@ solution>  sudo chmod 400 connect_baurice.pem , after this, the ssh connection s
 
 # Load Balancer
 
+![](load balancer.png)
+
 ## Mount S3 into EC2 instance
 
 [install Installing Mountpoint - Amazon Simple Storage Service](https://docs.aws.amazon.com/AmazonS3/latest/userguide/mountpoint-installation.html)
