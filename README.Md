@@ -56,7 +56,7 @@ solution>  sudo chmod 400 connect_baurice.pem , after this, the ssh connection s
 
 # Load Balancer
 
-![](load balancer.png)
+![](loadbalancer.png)
 
 ## Mount S3 into EC2 instance
 
