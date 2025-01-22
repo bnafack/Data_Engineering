@@ -65,6 +65,17 @@ solution>  sudo chmod 400 connect_baurice.pem , after this, the ssh connection s
 
 to mount :  mount-s3 bucketname localpath/
 
+# Pen testing
+install hydra
+` wget -c https://github.com/danielmiessler/SecLists/archive/master.zip -O SecList.zip \
+  && unzip SecList.zip \
+  && rm -f SecList.zip  `
+
+
+## Pen testing postgress
+
+` hydra -l postgres -P SecLists-master/Passwords/xato-net-10-million-passwords-1000000.txt localhost postgres `
+
 
 ## References: 
 [Security Groups and Network Access Control Lists (ACL)](https://www.youtube.com/watch?v=Qrg0gsehllY)
