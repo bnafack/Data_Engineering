@@ -1,0 +1,1 @@
+# Vacuum in postgress/Redshift
