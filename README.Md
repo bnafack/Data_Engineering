@@ -84,5 +84,7 @@ install hydra
 
 ## References: 
 [Security Groups and Network Access Control Lists (ACL)](https://www.youtube.com/watch?v=Qrg0gsehllY)
+
 [SNS VS SQS](https://awsfundamentals.com/blog/aws-sns-vs-sqs-what-are-the-main-differences)
+
 [SNS VS SQS VS Evenbridge](https://dev.to/aws-builders/event-driven-design-choosing-between-sns-sqs-and-eventbridge-i82)
