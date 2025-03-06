@@ -76,6 +76,11 @@ install hydra
 
 ` hydra -l postgres -P SecLists-master/Passwords/xato-net-10-million-passwords-1000000.txt localhost postgres `
 
+## Rsync copy between two remote server with log
+
+` nohup rsync -aHAXv --numeric-ids  --compress --bwlimit=0 --partial --inplace -e "ssh -T -c aes256-gcm@openssh.com -o Compression=no -o StrictHostKeyChecking=accept-new -x" /restore5/ftp-mirror/from_amkor/PRODUCTION/ /fabtest/manual-update/ > rsync.log 2>&1 & `
+& is to run it in background
+
 
 ## References: 
 [Security Groups and Network Access Control Lists (ACL)](https://www.youtube.com/watch?v=Qrg0gsehllY)
