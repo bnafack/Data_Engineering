@@ -86,6 +86,7 @@ check the log:  ` tail -f rsync.log `
 
 
 ## References: 
+[AWS Lambda function](https://docs.aws.amazon.com/lambda/latest/dg/lambda-concurrency.html)
 [Security Groups and Network Access Control Lists (ACL)](https://www.youtube.com/watch?v=Qrg0gsehllY)
 
 [SNS VS SQS](https://awsfundamentals.com/blog/aws-sns-vs-sqs-what-are-the-main-differences)
