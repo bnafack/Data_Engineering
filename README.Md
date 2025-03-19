@@ -84,6 +84,12 @@ install hydra
 check the log:  ` tail -f rsync.log `
 
 
+# Asigne folder permission and groups to a particular user. 
+This is important when multiple VMs have to share the same NFS file storage but on VM does not have an active directory able to recognise user ID.
+
+` chown ftp-mirror:ftp-mirror -R /folder/ `
+
+
 
 ## References: 
 [AWS Lambda function](https://docs.aws.amazon.com/lambda/latest/dg/lambda-concurrency.html)
