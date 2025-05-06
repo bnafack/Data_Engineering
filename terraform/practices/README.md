@@ -8,6 +8,8 @@ When you run the `terraform apply` command, to enable pinging the target resourc
 
 You must configure **ephemeral ports for return traffic**. Without this, you will not be able to use this feature correctly, even if your rules appear valid.
 
+This also help to connect to internet to install packages if https is allow. ["0.0.0.0/0"]
+
 ---
 
 ### EC2 Communication (Private ↔ Public)

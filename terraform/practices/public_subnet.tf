@@ -27,10 +27,6 @@ resource "aws_route_table_association" "rtb_igw" {
 
 }
 
-
-
-
-
 resource "aws_network_acl" "public_nacls" {
 
   vpc_id = aws_vpc.dev.id
@@ -44,6 +40,15 @@ resource "aws_network_acl" "public_nacls" {
     to_port    = 22
   }
 
+
+  egress {
+    protocol   = "tcp"
+    rule_no    = 2
+    action     = "allow"
+    cidr_block = var.vpc_cidr
+    from_port  = 22
+    to_port    = 22
+  }
   # Egress rules
 
   # Allow SSH return traffic (ephemeral ports)
@@ -56,6 +61,16 @@ resource "aws_network_acl" "public_nacls" {
     to_port    = 65535
   }
 
+  # Allow return traffic (ephemeral + ICMP reply)
+  ingress {
+    protocol   = "tcp"
+    rule_no    = 120
+    action     = "allow"
+    cidr_block = var.subnets[1]
+    from_port  = 1024
+    to_port    = 65535
+  }
+
   # Allow ICMP Echo Reply (type 0 = echo reply)
   egress {
     protocol   = "icmp"
@@ -63,6 +78,15 @@ resource "aws_network_acl" "public_nacls" {
     action     = "allow"
     cidr_block = var.public_cidr
     from_port  = 0
+    to_port    = 0
+  }
+
+  egress {
+    protocol   = "icmp"
+    rule_no    = 121
+    action     = "allow"
+    cidr_block = var.subnets[1]
+    from_port  = 8
     to_port    = 0
   }
 
@@ -94,8 +118,11 @@ resource "aws_network_acl" "public_nacls" {
 }
 
 
+
 resource "aws_network_acl_association" "public_subnet" {
   network_acl_id = aws_network_acl.public_nacls.id
   subnet_id      = aws_subnet.vpc_subnet[0].id
 }
+
+
 
