@@ -22,6 +22,8 @@ resource "aws_network_interface_sg_attachment" "public" {
   network_interface_id = aws_instance.dev.primary_network_interface_id
 }
 
+```
+
 
 ### 🔄 Security Group vs NACL Summary Table
 
