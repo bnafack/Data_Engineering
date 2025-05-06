@@ -15,6 +15,11 @@ variable "vpc_cidr" {
   type        = string
 }
 
+variable "public_cidr" {
+  description = "public cidr block"
+  type        = string
+}
+
 variable "vpc_name" {
   description = "vpc name"
   type        = string

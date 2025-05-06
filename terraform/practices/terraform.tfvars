@@ -5,3 +5,5 @@ vpc_name     = "dev-vpc2"
 rtb_public   = "rtb-public"
 
 public_key = "keys/ec2.pub"
+
+public_cidr = "0.0.0.0/0"

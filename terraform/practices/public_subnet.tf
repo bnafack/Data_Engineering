@@ -11,7 +11,7 @@ resource "aws_route_table" "public_rtb" {
   vpc_id = aws_vpc.dev.id
 
   route {
-    cidr_block = "0.0.0.0/0"
+    cidr_block = var.public_cidr
     gateway_id = aws_internet_gateway.public_igw.id
   }
 
@@ -39,7 +39,7 @@ resource "aws_network_acl" "public_nacls" {
     protocol   = "tcp"
     rule_no    = 2
     action     = "allow"
-    cidr_block = "0.0.0.0/0"
+    cidr_block = var.public_cidr
     from_port  = 22
     to_port    = 22
   }
@@ -51,7 +51,7 @@ resource "aws_network_acl" "public_nacls" {
     protocol   = "tcp"
     rule_no    = 110
     action     = "allow"
-    cidr_block = "0.0.0.0/0"
+    cidr_block = var.public_cidr
     from_port  = 1024
     to_port    = 65535
   }
@@ -61,7 +61,7 @@ resource "aws_network_acl" "public_nacls" {
     protocol   = "icmp"
     rule_no    = 120
     action     = "allow"
-    cidr_block = "0.0.0.0/0"
+    cidr_block = var.public_cidr
     from_port  = 0
     to_port    = 0
   }
@@ -71,7 +71,7 @@ resource "aws_network_acl" "public_nacls" {
     protocol   = "tcp"
     rule_no    = 4
     action     = "allow"
-    cidr_block = "0.0.0.0/0"
+    cidr_block = var.public_cidr
     from_port  = 80
     to_port    = 80
   }
@@ -82,7 +82,7 @@ resource "aws_network_acl" "public_nacls" {
     protocol   = "icmp"
     rule_no    = 111
     action     = "allow"
-    cidr_block = "0.0.0.0/0"
+    cidr_block = var.public_cidr
     from_port  = 8
     to_port    = 0
   }
