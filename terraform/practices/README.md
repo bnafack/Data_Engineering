@@ -33,3 +33,15 @@ resource "aws_network_interface_sg_attachment" "public" {
 | Return traffic rule | ❌ Not needed       | ✅ Must allow explicitly |
 | Ephemeral ports     | ❌ Not required     | ✅ Required              |
 | Applies to          | EC2 / ENI           | Subnet level             |
+
+
+## 🔐 Security Groups Are Stateful
+
+Unlike NACLs, **Security Groups (SGs)** are **stateful**, which means:
+
+- ✅ If you allow **outbound traffic**, the **response is automatically allowed back in**.
+- ✅ If you allow **inbound traffic**, the **response is automatically allowed back out**.
+
+📌 Therefore, you **do not need to manually open ephemeral port ranges** (like `1024–65535`) in Security Groups.
+
+This simplifies configuration compared to stateless NACLs.
