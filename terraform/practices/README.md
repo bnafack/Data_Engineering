@@ -21,3 +21,13 @@ resource "aws_network_interface_sg_attachment" "public" {
   security_group_id    = aws_security_group.sgr_vpc.id
   network_interface_id = aws_instance.dev.primary_network_interface_id
 }
+
+
+### 🔄 Security Group vs NACL Summary Table
+
+| Feature             | Security Group (SG) | Network ACL (NACL)      |
+|---------------------|---------------------|--------------------------|
+| Stateful            | ✅ Yes              | ❌ No                    |
+| Return traffic rule | ❌ Not needed       | ✅ Must allow explicitly |
+| Ephemeral ports     | ❌ Not required     | ✅ Required              |
+| Applies to          | EC2 / ENI           | Subnet level             |
