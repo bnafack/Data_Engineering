@@ -33,6 +33,12 @@ variable "rtb_public" {
 
 }
 
+variable "aws_region" {
+  description = "aws region"
+  type        = string
+
+}
+
 
 variable "public_key" {
   description = "Path to public key"

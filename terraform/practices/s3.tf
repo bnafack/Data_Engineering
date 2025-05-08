@@ -29,3 +29,14 @@ resource "aws_s3_bucket_acl" "acl" {
   bucket     = aws_s3_bucket.terraforms3bnaf.id
   acl        = "private"
 }
+
+
+resource "aws_vpc_endpoint" "s3" {
+  vpc_id          = aws_vpc.dev.id
+  service_name    = "com.amazonaws.${var.aws_region}.s3"
+  route_table_ids = ["${aws_route_table.public_rtb.id}"]
+
+  tags = {
+    Name = "my-s3-endpoint"
+  }
+}

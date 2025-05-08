@@ -60,9 +60,20 @@ resource "aws_network_acl" "main" {
     rule_no    = 4
     action     = "allow"
     cidr_block = var.subnets[0]
-    from_port  = 80
-    to_port    = 80
+    from_port  = 443
+    to_port    = 443
   }
+
+  egress {
+    protocol   = "tcp"
+    rule_no    = 4
+    action     = "allow"
+    cidr_block = var.subnets[0]
+    from_port  = 443
+    to_port    = 443
+  }
+
+
 
   # Allow ICMP Echo Request (type 8 = echo request)
 

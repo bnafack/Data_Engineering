@@ -51,7 +51,7 @@ resource "aws_network_acl" "public_nacls" {
   }
   # Egress rules
 
-  # Allow SSH return traffic (ephemeral ports)
+  # Allow return traffic (ephemeral + ICMP reply)
   egress {
     protocol   = "tcp"
     rule_no    = 110
@@ -64,12 +64,13 @@ resource "aws_network_acl" "public_nacls" {
   # Allow return traffic (ephemeral + ICMP reply)
   ingress {
     protocol   = "tcp"
-    rule_no    = 120
+    rule_no    = 130
     action     = "allow"
-    cidr_block = var.subnets[1]
+    cidr_block = var.public_cidr
     from_port  = 1024
     to_port    = 65535
   }
+
 
   # Allow ICMP Echo Reply (type 0 = echo reply)
   egress {
@@ -85,13 +86,12 @@ resource "aws_network_acl" "public_nacls" {
     protocol   = "icmp"
     rule_no    = 121
     action     = "allow"
-    cidr_block = var.subnets[1]
+    cidr_block = var.public_cidr
     from_port  = 8
     to_port    = 0
   }
 
-
-  ingress {
+  egress {
     protocol   = "tcp"
     rule_no    = 4
     action     = "allow"
@@ -99,6 +99,18 @@ resource "aws_network_acl" "public_nacls" {
     from_port  = 80
     to_port    = 80
   }
+
+
+
+  egress {
+    protocol   = "tcp"
+    rule_no    = 5
+    action     = "allow"
+    cidr_block = var.public_cidr
+    from_port  = 443
+    to_port    = 443
+  }
+
 
   # Allow ICMP Echo Request (type 8 = echo request)
 

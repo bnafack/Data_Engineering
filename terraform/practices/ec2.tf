@@ -18,11 +18,10 @@ resource "aws_instance" "dev" {
 
   availability_zone = "eu-west-1b"
 
-  /* ## Update your EC2 instance to use the new SG and detach the default one
+  ## Update your EC2 instance to use the new SG and detach the default one
   vpc_security_group_ids = [
     aws_security_group.sgr_vpc.id
   ]
-  */
 
   tags = {
     Name = "public_terraform1"
@@ -39,11 +38,26 @@ resource "aws_security_group" "sgr_vpc" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  egress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = [var.subnets[1]]
+  }
+
   ingress {
     from_port   = 8
     to_port     = 0
     protocol    = "icmp"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port        = 443
+    to_port          = 443
+    protocol         = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
   }
 
   egress {
@@ -70,10 +84,11 @@ resource "aws_security_group" "sgr_vpc" {
 
 
 
-resource "aws_network_interface_sg_attachment" "public" {
+
+/* resource "aws_network_interface_sg_attachment" "public" {
   security_group_id    = aws_security_group.sgr_vpc.id
   network_interface_id = aws_instance.dev.primary_network_interface_id
 }
 
-
+*/
 
