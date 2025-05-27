@@ -1,0 +1,14 @@
+curl -X POST https://nx18f9i1hj.execute-api.eu-west-1.amazonaws.com/test \
+  -H "Content-Type: application/json" \
+  -d '{
+    "data": {
+      "id": 2,
+      "email": "janet.weaver@reqres.in",
+      "first_name": "Janet",
+      "last_name": "Weaver"
+    },
+    "support": {
+      "url": "https://reqres.in/#support-heading",
+      "text": "To keep ReqRes free, contributions towards server costs are appreciated!"
+    }
+  }' | jq .
