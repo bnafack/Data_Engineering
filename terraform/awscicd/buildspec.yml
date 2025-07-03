@@ -1,0 +1,19 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo Installing Terraform...
+      - curl -O https://releases.hashicorp.com/terraform/1.8.3/terraform_1.8.3_linux_amd64.zip
+      - unzip terraform_1.8.3_linux_amd64.zip
+      - mv terraform /usr/local/bin/
+  pre_build:
+    commands:
+      - terraform --version
+      - aws sts get-caller-identity
+  build:
+    commands:
+      - terraform init
+      - terraform plan -out=tfplan
+      - terraform apply -auto-approve tfplan
+      - terraform destroy -auto-approve
