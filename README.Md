@@ -89,7 +89,8 @@ This is important when multiple VMs have to share the same NFS file storage but 
 
 ` chown ftp-mirror:ftp-mirror -R /folder/ `
 
-
+## OpenData for postgresql
+[Improving Public Access to Aggregate Content of ClinicalTrials.gov](https://aact.ctti-clinicaltrials.org/)
 
 ## References: 
 [AWS Lambda function](https://docs.aws.amazon.com/lambda/latest/dg/lambda-concurrency.html)
