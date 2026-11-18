@@ -1,0 +1,157 @@
+<mxfile host="app.diagrams.net" type="device">
+  <diagram id="scaleway-arch-p5" name="Proposal 5">
+    <mxGraphModel dx="1520" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1530" pageHeight="810" background="#F8FAFC" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="title" value="Proposal 5 – Single Dedibox VPS · self-hosted services · LWS DNS" style="text;html=1;fontSize=22;fontStyle=1;fontColor=#0F172A;align=left;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="30" y="20" width="1000" height="40" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="scw" value="☁️ Scaleway – Dedibox VPS + Cloud services (fr-par)" style="swimlane;html=1;startSize=34;rounded=1;arcSize=2;fillColor=#4F0599;swimlaneFillColor=#FAF5FF;strokeColor=#4F0599;strokeWidth=2;fontColor=#FFFFFF;fontStyle=1;fontSize=15;align=left;spacingLeft=15;" vertex="1" parent="1">
+          <mxGeometry x="430" y="70" width="910" height="640" as="geometry"/>
+        </mxCell>
+
+        <!-- External -->
+        <mxCell id="dns" value="&lt;b&gt;🌍 LWS DNS&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:11px&quot;&gt;example.com / app.example.com&lt;br&gt;A record → VPS public IP&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ECFEFF;strokeColor=#0891B2;strokeWidth=2;fontColor=#155E75;fontSize=15;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="215" y="120" width="180" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="users" value="&lt;b&gt;🌐 Users&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:12px&quot;&gt;Internet&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#64748B;fontColor=#0F172A;fontSize=15;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="290" width="130" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="admin" value="&lt;b&gt;👤 Admin / Ops&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:11px&quot;&gt;SSH key only (no password)&lt;br&gt;fixed admin IPs&lt;br&gt;DB via SSH tunnel&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#B91C1C;fontColor=#0F172A;fontSize=14;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="415" width="150" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="ci" value="&lt;b&gt;🔧 CI/CD&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:11px&quot;&gt;build → push to Registry&lt;br&gt;deploy over SSH&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#64748B;fontColor=#0F172A;fontSize=14;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="560" width="150" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="git" value="&lt;b&gt;📁 Git Repo&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:11px&quot;&gt;code + docker-compose.yml&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#64748B;fontColor=#0F172A;fontSize=14;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="690" width="150" height="55" as="geometry"/>
+        </mxCell>
+
+        <!-- VPS -->
+        <mxCell id="vps" value="&lt;b&gt;🖥️ Dedibox VPS-START-2-XXL · public IPv4&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:12px&quot;&gt;16 cores · 32 GB RAM · 320 GB SSD · 1 Gbps · €89.99/mo&lt;/font&gt;" style="rounded=1;arcSize=3;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#2563EB;strokeWidth=2.5;fontColor=#1E3A8A;fontSize=16;verticalAlign=top;spacingTop=4;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="460" y="200" width="560" height="480" as="geometry"/>
+        </mxCell>
+        <mxCell id="fw" value="&lt;b&gt;🔥 Firewall (nftables/ufw) · 80/443 open · 22 admin IPs only · fail2ban&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEE2E2;strokeColor=#DC2626;strokeWidth=1.5;fontColor=#7F1D1D;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="475" y="255" width="530" height="34" as="geometry"/>
+        </mxCell>
+        <mxCell id="proxy" value="&lt;b&gt;🔀 Reverse proxy (Traefik / Caddy) – only public entry point&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:11px&quot;&gt;Let's Encrypt TLS · rate limiting · security headers&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFEDD5;strokeColor=#EA580C;strokeWidth=1.5;fontColor=#9A3412;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="475" y="298" width="530" height="48" as="geometry"/>
+        </mxCell>
+        <mxCell id="docker" value="&lt;b&gt;🐳 Docker – internal network (no ports published to the internet)&lt;/b&gt;" style="rounded=1;arcSize=3;whiteSpace=wrap;html=1;dashed=1;dashPattern=6 4;fillColor=#EFF6FF;strokeColor=#60A5FA;fontColor=#1E3A8A;fontSize=12;align=left;verticalAlign=top;spacingLeft=12;spacingTop=4;" vertex="1" parent="1">
+          <mxGeometry x="475" y="356" width="530" height="312" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="app" value="&lt;b&gt;🐳 App / API&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:11px&quot;&gt;3 × 4 GB containers&lt;br&gt;calls Generative APIs, S3, Dedibox&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#3B82F6;fontColor=#1E3A8A;fontSize=13;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="490" y="386" width="250" height="56" as="geometry"/>
+        </mxCell>
+        <mxCell id="front" value="&lt;b&gt;🐳 Frontend&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:11px&quot;&gt;static / SSR container&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#3B82F6;fontColor=#1E3A8A;fontSize=13;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="750" y="386" width="240" height="56" as="geometry"/>
+        </mxCell>
+        <mxCell id="pg" value="&lt;b&gt;🐘 PostgreSQL (self-hosted)&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:11px&quot;&gt;volume on local SSD · not exposed&lt;br&gt;only reachable on Docker network&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DCFCE7;strokeColor=#16A34A;fontColor=#14532D;fontSize=13;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="490" y="450" width="250" height="56" as="geometry"/>
+        </mxCell>
+        <mxCell id="redis" value="&lt;b&gt;⚡ Redis (self-hosted)&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:11px&quot;&gt;password + internal only&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEE2E2;strokeColor=#DC2626;fontColor=#7F1D1D;fontSize=13;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="750" y="450" width="240" height="56" as="geometry"/>
+        </mxCell>
+        <mxCell id="workers" value="&lt;b&gt;⚙️ Workers / cron&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:11px&quot;&gt;background jobs, queues&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#64748B;fontColor=#334155;fontSize=13;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="490" y="514" width="250" height="56" as="geometry"/>
+        </mxCell>
+        <mxCell id="backup" value="&lt;b&gt;💾 Backup job&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:11px&quot;&gt;pgBackRest / pg_dump → S3&lt;br&gt;nightly + WAL · restore tested&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E8FF;strokeColor=#9333EA;fontColor=#6B21A8;fontSize=13;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="750" y="514" width="240" height="56" as="geometry"/>
+        </mxCell>
+        <mxCell id="mon" value="&lt;b&gt;📊 Monitoring&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:11px&quot;&gt;Prometheus + Grafana / Netdata&lt;br&gt;or ship logs to Cockpit&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEFCE8;strokeColor=#CA8A04;fontColor=#713F12;fontSize=13;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="490" y="578" width="250" height="56" as="geometry"/>
+        </mxCell>
+        <mxCell id="compose" value="&lt;b&gt;🧰 Docker Compose&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:11px&quot;&gt;compose pull &amp;amp;&amp;amp; up -d&lt;br&gt;unattended-upgrades for OS patches&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#64748B;fontColor=#334155;fontSize=13;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="750" y="578" width="240" height="56" as="geometry"/>
+        </mxCell>
+        <mxCell id="disk" value="Local SSD 320 GB: OS · Docker images · PostgreSQL data · Redis AOF" style="text;html=1;fontSize=11;fontColor=#1E40AF;align=left;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="490" y="645" width="500" height="20" as="geometry"/>
+        </mxCell>
+
+        <!-- Scaleway services -->
+        <mxCell id="registry" value="&lt;b&gt;📦 Container Registry&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:12px&quot;&gt;private namespace · images&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0F2FE;strokeColor=#0284C7;strokeWidth=2;fontColor=#075985;fontSize=15;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1080" y="210" width="240" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="s3" value="&lt;b&gt;🗂️ Object Storage (S3)&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:12px&quot;&gt;documents bucket&lt;br&gt;backups bucket (versioned)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E8FF;strokeColor=#9333EA;strokeWidth=2;fontColor=#6B21A8;fontSize=15;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1080" y="300" width="240" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="genai" value="&lt;b&gt;🧠 Generative APIs&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:12px&quot;&gt;Mistral models&lt;br&gt;OpenAI-compatible · IAM API key&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDE9FE;strokeColor=#4F0599;strokeWidth=2;fontColor=#4F0599;fontSize=15;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1080" y="400" width="240" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="carto" value="&lt;b&gt;🗄️ Dedibox server&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:12px&quot;&gt;Cartography service&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F1F5F9;strokeColor=#334155;strokeWidth=2;fontColor=#0F172A;fontSize=15;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1080" y="515" width="240" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="risks" value="&lt;b&gt;⚠️ Trade-offs&lt;/b&gt;&lt;br&gt;• Single server = single point of failure&lt;br&gt;• No WAF: firewall + fail2ban + proxy limits&lt;br&gt;• You run DB backups, upgrades, patching&lt;br&gt;• SSH exposed: keys only, IP-restricted" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFF7ED;strokeColor=#F59E0B;fontColor=#78350F;fontSize=10.5;align=left;verticalAlign=top;spacingLeft=10;spacingTop=4;" vertex="1" parent="1">
+          <mxGeometry x="1080" y="600" width="245" height="100" as="geometry"/>
+        </mxCell>
+
+        <!-- Edges -->
+        <mxCell id="e1" value="DNS lookup" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#0891B2;strokeWidth=1.8;dashed=1;dashPattern=5 4;endArrow=block;endFill=1;fontSize=11;fontColor=#0E7490;labelBackgroundColor=#F8FAFC;exitX=0.5;exitY=0;entryX=0;entryY=0.5;" edge="1" parent="1" source="users" target="dns">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e2" value="resolves to VPS IP" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#0891B2;strokeWidth=1.8;dashed=1;dashPattern=5 4;endArrow=block;endFill=1;fontSize=11;fontColor=#0E7490;labelBackgroundColor=#FAF5FF;exitX=1;exitY=0.5;entryX=0.25;entryY=0;" edge="1" parent="1" source="dns" target="vps">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e3" value="HTTPS :443 (and :80 → redirect)" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#EA580C;strokeWidth=2.5;endArrow=block;endFill=1;fontSize=11;fontStyle=1;fontColor=#C2410C;labelBackgroundColor=#F8FAFC;exitX=1;exitY=0.46;entryX=0;entryY=0.5;" edge="1" parent="1" source="users" target="proxy">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e4" value="SSH :22 (key + IP allowlist)" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#B91C1C;strokeWidth=2.5;endArrow=block;endFill=1;fontSize=11;fontStyle=1;fontColor=#B91C1C;labelBackgroundColor=#F8FAFC;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="admin" target="fw">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="448" y="455"/>
+              <mxPoint x="448" y="272"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e5" value="deploy (SSH: compose pull / up)" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#475569;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;fontColor=#334155;labelBackgroundColor=#F8FAFC;exitX=1;exitY=0.49;entryX=0;entryY=0.77;" edge="1" parent="1" source="ci" target="docker">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e6" value="trigger" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#475569;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;fontColor=#334155;labelBackgroundColor=#F8FAFC;" edge="1" parent="1" source="git" target="ci">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e7" value="pull" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#475569;strokeWidth=2;endArrow=block;endFill=1;fontSize=10;fontColor=#334155;labelBackgroundColor=#FAF5FF;exitX=0;exitY=0.49;entryX=1;entryY=0.09;" edge="1" parent="1" source="registry" target="vps">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e8" value="files + backups" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#475569;strokeWidth=2;endArrow=block;endFill=1;fontSize=10;fontColor=#334155;labelBackgroundColor=#FAF5FF;exitX=1;exitY=0.28;entryX=0;entryY=0.49;" edge="1" parent="1" source="vps" target="s3">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e9" value="AI" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#4F0599;strokeWidth=2.5;endArrow=block;endFill=1;fontSize=10;fontStyle=1;fontColor=#4F0599;labelBackgroundColor=#FAF5FF;exitX=1;exitY=0.51;entryX=0;entryY=0.5;" edge="1" parent="1" source="vps" target="genai">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e10" value="HTTPS" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#475569;strokeWidth=2;endArrow=block;endFill=1;fontSize=10;fontColor=#334155;labelBackgroundColor=#FAF5FF;exitX=1;exitY=0.73;entryX=0;entryY=0.5;" edge="1" parent="1" source="vps" target="carto">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Legend -->
+        <mxCell id="lg1" value="Scaleway" style="rounded=0;html=1;fillColor=#FAF5FF;strokeColor=#4F0599;fontSize=12;fontColor=#334155;labelPosition=right;align=left;spacingLeft=4;" vertex="1" parent="1">
+          <mxGeometry x="30" y="768" width="14" height="14" as="geometry"/>
+        </mxCell>
+        <mxCell id="lg2" value="LWS DNS" style="rounded=0;html=1;fillColor=#ECFEFF;strokeColor=#0891B2;fontSize=12;fontColor=#334155;labelPosition=right;align=left;spacingLeft=4;" vertex="1" parent="1">
+          <mxGeometry x="130" y="768" width="14" height="14" as="geometry"/>
+        </mxCell>
+        <mxCell id="lg3" value="VPS / Docker" style="rounded=0;html=1;fillColor=#DBEAFE;strokeColor=#2563EB;fontSize=12;fontColor=#334155;labelPosition=right;align=left;spacingLeft=4;" vertex="1" parent="1">
+          <mxGeometry x="235" y="768" width="14" height="14" as="geometry"/>
+        </mxCell>
+        <mxCell id="lg4" value="Public entry (443)" style="rounded=0;html=1;fillColor=#FFEDD5;strokeColor=#EA580C;fontSize=12;fontColor=#334155;labelPosition=right;align=left;spacingLeft=4;" vertex="1" parent="1">
+          <mxGeometry x="355" y="768" width="14" height="14" as="geometry"/>
+        </mxCell>
+        <mxCell id="lg5" value="Firewall / SSH" style="rounded=0;html=1;fillColor=#FEE2E2;strokeColor=#DC2626;fontSize=12;fontColor=#334155;labelPosition=right;align=left;spacingLeft=4;" vertex="1" parent="1">
+          <mxGeometry x="495" y="768" width="14" height="14" as="geometry"/>
+        </mxCell>
+        <mxCell id="lg6" value="Self-hosted DB" style="rounded=0;html=1;fillColor=#DCFCE7;strokeColor=#16A34A;fontSize=12;fontColor=#334155;labelPosition=right;align=left;spacingLeft=4;" vertex="1" parent="1">
+          <mxGeometry x="625" y="768" width="14" height="14" as="geometry"/>
+        </mxCell>
+        <mxCell id="lg7" value="Storage / backups" style="rounded=0;html=1;fillColor=#F3E8FF;strokeColor=#9333EA;fontSize=12;fontColor=#334155;labelPosition=right;align=left;spacingLeft=4;" vertex="1" parent="1">
+          <mxGeometry x="755" y="768" width="14" height="14" as="geometry"/>
+        </mxCell>
+        <mxCell id="cost" value="&lt;b&gt;Est. cost: VPS €89.99/mo + Registry/S3 usage + AI tokens&lt;/b&gt;" style="text;html=1;fontSize=12;fontColor=#334155;align=left;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="930" y="765" width="460" height="20" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

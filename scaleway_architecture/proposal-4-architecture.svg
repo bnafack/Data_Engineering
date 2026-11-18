@@ -1,0 +1,173 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1520 800" width="1520" height="800" font-family="Segoe UI, Arial, sans-serif" role="img" aria-label="Proposal 4 – Scaleway Serverless Containers behind Load Balancer architecture diagram">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker>
+    <marker id="arrG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0d9488"/></marker>
+    <marker id="arrP" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#4f0599"/></marker>
+    <filter id="sh" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.18"/></filter>
+  </defs>
+
+  <rect width="1520" height="800" fill="#f8fafc"/>
+  <text x="30" y="42" font-size="22" font-weight="700" fill="#0f172a">Proposal 4 – Serverless Containers behind Load Balancer (private ingress)</text>
+
+  <!-- Scaleway cloud boundary -->
+  <rect x="190" y="70" width="1150" height="660" rx="16" fill="#faf5ff" stroke="#4f0599" stroke-width="2"/>
+  <rect x="190" y="70" width="1150" height="34" rx="16" fill="#4f0599"/>
+  <rect x="190" y="88" width="1150" height="16" fill="#4f0599"/>
+  <text x="210" y="93" font-size="15" font-weight="700" fill="#ffffff">☁️ Scaleway Cloud – Region fr-par</text>
+
+  <!-- External actors -->
+  <g filter="url(#sh)"><rect x="30" y="335" width="130" height="70" rx="10" fill="#ffffff" stroke="#64748b" stroke-width="1.5"/></g>
+  <text x="95" y="365" font-size="15" font-weight="600" text-anchor="middle" fill="#0f172a">🌐 Users</text>
+  <text x="95" y="385" font-size="12" text-anchor="middle" fill="#475569">Internet</text>
+
+  <g filter="url(#sh)"><rect x="30" y="515" width="140" height="70" rx="10" fill="#ffffff" stroke="#64748b" stroke-width="1.5"/></g>
+  <text x="100" y="542" font-size="14" font-weight="700" text-anchor="middle" fill="#0f172a">🔧 CI/CD</text>
+  <text x="100" y="560" font-size="11" text-anchor="middle" fill="#475569">GitHub Actions / GitLab CI</text>
+  <text x="100" y="575" font-size="11" text-anchor="middle" fill="#475569">build · push · deploy</text>
+
+  <g filter="url(#sh)"><rect x="30" y="650" width="140" height="60" rx="10" fill="#ffffff" stroke="#64748b" stroke-width="1.5"/></g>
+  <text x="100" y="676" font-size="14" font-weight="600" text-anchor="middle" fill="#0f172a">📁 Git Repo</text>
+  <text x="100" y="695" font-size="12" text-anchor="middle" fill="#475569">App code + Terraform</text>
+
+  <!-- WAF -->
+  <g filter="url(#sh)"><rect x="205" y="335" width="120" height="70" rx="10" fill="#fff7ed" stroke="#f97316" stroke-width="2"/></g>
+  <text x="265" y="365" font-size="14" font-weight="600" text-anchor="middle" fill="#9a3412">🛡️ WAF</text>
+  <text x="265" y="385" font-size="11" text-anchor="middle" fill="#9a3412">Protection on LB</text>
+
+  <!-- Load Balancer -->
+  <g filter="url(#sh)"><rect x="340" y="325" width="125" height="90" rx="10" fill="#fff7ed" stroke="#f97316" stroke-width="2"/></g>
+  <text x="402" y="350" font-size="14" font-weight="600" text-anchor="middle" fill="#9a3412">⚖️ Network LB</text>
+  <text x="402" y="368" font-size="11" text-anchor="middle" fill="#9a3412">L4 / TCP</text>
+  <text x="402" y="384" font-size="11" text-anchor="middle" fill="#9a3412">Public IP</text>
+  <text x="402" y="400" font-size="11" text-anchor="middle" fill="#9a3412">backend via VPC</text>
+
+  <!-- Top row: Registry / S3 -->
+  <g filter="url(#sh)"><rect x="505" y="120" width="180" height="60" rx="10" fill="#e0f2fe" stroke="#0284c7" stroke-width="2"/></g>
+  <text x="595" y="145" font-size="15" font-weight="700" text-anchor="middle" fill="#075985">📦 Container Registry</text>
+  <text x="595" y="165" font-size="12" text-anchor="middle" fill="#0369a1">Docker images</text>
+
+  <g filter="url(#sh)"><rect x="715" y="120" width="180" height="60" rx="10" fill="#f3e8ff" stroke="#9333ea" stroke-width="2"/></g>
+  <text x="805" y="145" font-size="15" font-weight="700" text-anchor="middle" fill="#6b21a8">🗂️ Object Storage (S3)</text>
+  <text x="805" y="165" font-size="12" text-anchor="middle" fill="#7e22ce">Documents / files</text>
+
+  <!-- VPC -->
+  <rect x="490" y="230" width="640" height="345" rx="14" fill="#eef6ff" stroke="#3b82f6" stroke-width="2" stroke-dasharray="8 5"/>
+  <text x="845" y="562" font-size="14" font-weight="700" fill="#1d4ed8">VPC – Private Network</text>
+
+  <!-- Serverless Containers namespace -->
+  <g filter="url(#sh)"><rect x="505" y="250" width="275" height="310" rx="12" fill="#ccfbf1" stroke="#0d9488" stroke-width="2"/></g>
+  <text x="642" y="273" font-size="15" font-weight="700" text-anchor="middle" fill="#134e4a">⚡ Serverless Containers</text>
+  <text x="642" y="289" font-size="11" text-anchor="middle" fill="#115e59">Namespace · no servers to manage</text>
+
+  <rect x="518" y="298" width="250" height="40" rx="6" fill="#ffffff" stroke="#0d9488" stroke-width="1.5"/>
+  <text x="643" y="315" font-size="12" font-weight="700" text-anchor="middle" fill="#134e4a">🔒 Private ingress only</text>
+  <text x="643" y="331" font-size="10" text-anchor="middle" fill="#115e59">public endpoint disabled</text>
+
+  <rect x="518" y="346" width="250" height="62" rx="8" fill="#ffffff" stroke="#14b8a6"/>
+  <text x="530" y="365" font-size="13" font-weight="700" fill="#134e4a">🐳 App / API container</text>
+  <text x="530" y="382" font-size="11" fill="#115e59">4 GB RAM · autoscale min 1 → max N</text>
+  <text x="530" y="398" font-size="11" fill="#115e59">pay per use (vCPU·s, GB·s)</text>
+
+  <rect x="518" y="416" width="250" height="42" rx="8" fill="#ffffff" stroke="#14b8a6"/>
+  <text x="530" y="434" font-size="13" font-weight="700" fill="#134e4a">🐳 Frontend container</text>
+  <text x="530" y="450" font-size="11" fill="#115e59">autoscale · private ingress</text>
+
+  <rect x="518" y="466" width="250" height="42" rx="8" fill="#ffffff" stroke="#14b8a6"/>
+  <text x="530" y="484" font-size="13" font-weight="700" fill="#134e4a">⏱️ Serverless Jobs</text>
+  <text x="530" y="500" font-size="11" fill="#115e59">cron · batch · background workers</text>
+
+  <rect x="518" y="516" width="250" height="34" rx="8" fill="#f0fdfa" stroke="#5eead4" stroke-dasharray="4 3"/>
+  <text x="530" y="537" font-size="11" font-weight="600" fill="#134e4a">🔌 Private Network: ingress + egress</text>
+
+  <!-- PostgreSQL / Redis -->
+  <g filter="url(#sh)"><rect x="830" y="270" width="280" height="85" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/></g>
+  <text x="970" y="293" font-size="15" font-weight="700" text-anchor="middle" fill="#14532d">🐘 Managed PostgreSQL</text>
+  <text x="970" y="311" font-size="11" text-anchor="middle" fill="#166534">Block storage – 15k IOPS · auto backups</text>
+  <text x="970" y="328" font-size="11" text-anchor="middle" fill="#166534">Private endpoint :5432</text>
+  <text x="970" y="344" font-size="11" text-anchor="middle" fill="#166534">use connection pooling</text>
+
+  <g filter="url(#sh)"><rect x="830" y="375" width="280" height="60" rx="10" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/></g>
+  <text x="970" y="400" font-size="15" font-weight="700" text-anchor="middle" fill="#7f1d1d">⚡ Managed Redis</text>
+  <text x="970" y="420" font-size="11" text-anchor="middle" fill="#991b1b">Private endpoint :6379 · cache / sessions</text>
+
+  <!-- Dedibox / Generative APIs -->
+  <g filter="url(#sh)"><rect x="1155" y="250" width="170" height="75" rx="10" fill="#f1f5f9" stroke="#334155" stroke-width="2"/></g>
+  <text x="1240" y="280" font-size="15" font-weight="700" text-anchor="middle" fill="#0f172a">🗄️ Dedibox</text>
+  <text x="1240" y="300" font-size="12" text-anchor="middle" fill="#334155">Cartography service</text>
+
+  <g filter="url(#sh)"><rect x="1155" y="440" width="170" height="105" rx="10" fill="#ede9fe" stroke="#4f0599" stroke-width="2"/></g>
+  <text x="1240" y="465" font-size="15" font-weight="700" text-anchor="middle" fill="#4f0599">🧠 Generative APIs</text>
+  <text x="1240" y="485" font-size="12" text-anchor="middle" fill="#4f0599">Mistral models</text>
+  <text x="1240" y="503" font-size="12" text-anchor="middle" fill="#4f0599">OpenAI-compatible API</text>
+  <text x="1240" y="521" font-size="12" text-anchor="middle" fill="#4f0599">IAM API key · EU hosted</text>
+
+  <!-- Bottom row: Cockpit / Secret Manager -->
+  <g filter="url(#sh)"><rect x="505" y="620" width="180" height="55" rx="10" fill="#fefce8" stroke="#ca8a04" stroke-width="2"/></g>
+  <text x="595" y="644" font-size="14" font-weight="700" text-anchor="middle" fill="#713f12">📊 Cockpit</text>
+  <text x="595" y="662" font-size="11" text-anchor="middle" fill="#854d0e">logs · metrics · alerts</text>
+
+  <g filter="url(#sh)"><rect x="715" y="620" width="180" height="55" rx="10" fill="#fefce8" stroke="#ca8a04" stroke-width="2"/></g>
+  <text x="805" y="644" font-size="14" font-weight="700" text-anchor="middle" fill="#713f12">🔑 Secret Manager</text>
+  <text x="805" y="662" font-size="11" text-anchor="middle" fill="#854d0e">DB / API keys as env secrets</text>
+
+  <!-- Notes -->
+  <rect x="920" y="612" width="405" height="108" rx="10" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="934" y="632" font-size="13" font-weight="700" fill="#0f172a">Ingress: WAF → public LB → private container</text>
+  <text x="934" y="651" font-size="11" fill="#334155">• Containers not exposed to the internet (VPC only)</text>
+  <text x="934" y="667" font-size="11" fill="#334155">• No VM / bastion / OS patching · CI/CD deploys</text>
+  <text x="934" y="683" font-size="11" fill="#334155">• No persistent disk – files to S3, state to DB / Redis</text>
+  <text x="934" y="699" font-size="11" fill="#334155">• Dedibox: secure with token / mTLS (no fixed egress IP)</text>
+  <text x="934" y="715" font-size="11" font-weight="600" fill="#b45309">• Verify: LB backend → container private endpoint</text>
+
+  <!-- Arrows -->
+  <g stroke="#475569" stroke-width="2" fill="none" marker-end="url(#arr)">
+    <line x1="160" y1="370" x2="203" y2="370"/>
+    <line x1="325" y1="370" x2="338" y2="370"/>
+    <line x1="100" y1="650" x2="100" y2="587"/>
+    <path d="M170 545 H478 V150 H503"/>
+    <line x1="760" y1="250" x2="760" y2="182"/>
+    <line x1="780" y1="310" x2="828" y2="310"/>
+    <line x1="780" y1="405" x2="828" y2="405"/>
+    <path d="M780 262 H1140 V287 H1153"/>
+  </g>
+  <!-- LB private backend arrow (bold) -->
+  <path d="M465 360 H490 V318 H516" stroke="#f97316" stroke-width="2.5" fill="none" marker-end="url(#arr)"/>
+  <!-- Registry to containers (deploy / pull) -->
+  <line x1="595" y1="182" x2="595" y2="248" stroke="#0d9488" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrG)"/>
+  <!-- Observability / secrets -->
+  <g stroke="#ca8a04" stroke-width="1.5" stroke-dasharray="4 3" fill="none" marker-end="url(#arr)">
+    <line x1="595" y1="560" x2="595" y2="618"/>
+    <line x1="760" y1="560" x2="760" y2="618"/>
+  </g>
+  <!-- AI calls -->
+  <path d="M780 530 H805 V598 H1240 V547" stroke="#4f0599" stroke-width="2.5" fill="none" marker-end="url(#arrP)"/>
+
+  <!-- Labels -->
+  <g font-size="11" fill="#334155">
+    <text x="164" y="362">HTTPS</text>
+    <text x="410" y="312" fill="#c2410c" font-weight="600">private (VPC)</text>
+    <text x="210" y="537">push image</text>
+    <text x="603" y="215" fill="#0d9488" font-weight="600">pull / deploy</text>
+    <text x="768" y="215">files</text>
+    <text x="789" y="303">SQL</text>
+    <text x="787" y="398">cache</text>
+    <text x="930" y="257">HTTPS (token / mTLS)</text>
+    <text x="603" y="595" fill="#854d0e">logs</text>
+    <text x="768" y="595" fill="#854d0e">secrets</text>
+    <text x="960" y="592" fill="#4f0599" font-weight="600">AI calls (HTTPS)</text>
+    <text x="108" y="625">trigger</text>
+  </g>
+
+  <!-- Legend -->
+  <g font-size="12" fill="#334155">
+    <rect x="30" y="760" width="14" height="14" fill="#faf5ff" stroke="#4f0599"/><text x="50" y="772">Scaleway Cloud</text>
+    <rect x="160" y="760" width="14" height="14" fill="#ccfbf1" stroke="#0d9488"/><text x="180" y="772">Serverless</text>
+    <rect x="265" y="760" width="14" height="14" fill="#fff7ed" stroke="#f97316"/><text x="285" y="772">Public edge</text>
+    <rect x="375" y="760" width="14" height="14" fill="#dcfce7" stroke="#16a34a"/><text x="395" y="772">Managed DB</text>
+    <rect x="485" y="760" width="14" height="14" fill="#f3e8ff" stroke="#9333ea"/><text x="505" y="772">Storage</text>
+    <rect x="570" y="760" width="14" height="14" fill="#ede9fe" stroke="#4f0599"/><text x="590" y="772">AI (Generative APIs)</text>
+    <rect x="730" y="760" width="14" height="14" fill="#fefce8" stroke="#ca8a04"/><text x="750" y="772">Ops (logs / secrets)</text>
+    <rect x="890" y="760" width="14" height="14" fill="#ffffff" stroke="#64748b"/><text x="910" y="772">External</text>
+    <text x="1010" y="772" font-weight="600">Billing: pay per use + LB</text>
+  </g>
+</svg>

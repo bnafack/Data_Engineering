@@ -1,0 +1,175 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1450 700" width="1450" height="700" font-family="Segoe UI, Arial, sans-serif" role="img" aria-label="Cloud architecture diagram">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#475569"/>
+    </marker>
+    <filter id="sh" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+
+  <rect width="1450" height="700" fill="#f8fafc"/>
+  <text x="30" y="40" font-size="22" font-weight="700" fill="#0f172a">Proposal 1 – Scaleway (public Mistral API)</text>
+
+  <!-- VPC -->
+  <rect x="570" y="120" width="600" height="450" rx="14" fill="#eef6ff" stroke="#3b82f6" stroke-width="2" stroke-dasharray="8 5"/>
+  <text x="590" y="146" font-size="15" font-weight="700" fill="#1d4ed8">VPC – Private Network (no public IPs)</text>
+
+  <!-- Internet users -->
+  <g filter="url(#sh)">
+    <rect x="30" y="340" width="130" height="70" rx="10" fill="#ffffff" stroke="#64748b" stroke-width="1.5"/>
+  </g>
+  <text x="95" y="370" font-size="15" font-weight="600" text-anchor="middle" fill="#0f172a">🌐 Users</text>
+  <text x="95" y="390" font-size="12" text-anchor="middle" fill="#475569">Internet</text>
+
+  <!-- WAF -->
+  <g filter="url(#sh)">
+    <rect x="200" y="340" width="140" height="70" rx="10" fill="#fff7ed" stroke="#f97316" stroke-width="2"/>
+  </g>
+  <text x="270" y="370" font-size="15" font-weight="600" text-anchor="middle" fill="#9a3412">🛡️ WAF</text>
+  <text x="270" y="390" font-size="12" text-anchor="middle" fill="#9a3412">Protection on LB</text>
+
+  <!-- LB -->
+  <g filter="url(#sh)">
+    <rect x="380" y="335" width="150" height="80" rx="10" fill="#fff7ed" stroke="#f97316" stroke-width="2"/>
+  </g>
+  <text x="455" y="362" font-size="15" font-weight="600" text-anchor="middle" fill="#9a3412">⚖️ Network LB</text>
+  <text x="455" y="382" font-size="12" text-anchor="middle" fill="#9a3412">L4 / TCP</text>
+  <text x="455" y="400" font-size="12" text-anchor="middle" fill="#9a3412">Public IP</text>
+
+  <!-- App VM -->
+  <g filter="url(#sh)">
+    <rect x="600" y="290" width="220" height="160" rx="12" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+  </g>
+  <text x="710" y="318" font-size="16" font-weight="700" text-anchor="middle" fill="#1e3a8a">🖥️ App VM</text>
+  <rect x="618" y="332" width="184" height="32" rx="6" fill="#ffffff" stroke="#93c5fd"/>
+  <text x="710" y="353" font-size="13" text-anchor="middle" fill="#1e3a8a">🐳 Docker – app containers</text>
+  <rect x="618" y="372" width="184" height="32" rx="6" fill="#ffffff" stroke="#93c5fd"/>
+  <text x="710" y="393" font-size="13" text-anchor="middle" fill="#1e3a8a">🔄 Argo CD (k3s)</text>
+  <text x="710" y="432" font-size="11" text-anchor="middle" fill="#1e40af">Private IP only</text>
+
+  <!-- Block storage -->
+  <g filter="url(#sh)">
+    <rect x="620" y="490" width="180" height="60" rx="10" fill="#f3e8ff" stroke="#9333ea" stroke-width="2"/>
+  </g>
+  <text x="710" y="516" font-size="14" font-weight="600" text-anchor="middle" fill="#6b21a8">💽 Block Storage</text>
+  <text x="710" y="535" font-size="12" text-anchor="middle" fill="#6b21a8">(EBS-like) attached volume</text>
+
+  <!-- PostgreSQL -->
+  <g filter="url(#sh)">
+    <rect x="900" y="165" width="240" height="95" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+  </g>
+  <text x="1020" y="192" font-size="15" font-weight="700" text-anchor="middle" fill="#14532d">🐘 Managed PostgreSQL</text>
+  <text x="1020" y="212" font-size="12" text-anchor="middle" fill="#166534">Block storage – 15k IOPS</text>
+  <text x="1020" y="230" font-size="12" text-anchor="middle" fill="#166534">Automatic backups</text>
+  <text x="1020" y="248" font-size="12" text-anchor="middle" fill="#166534">Private endpoint :5432</text>
+
+  <!-- Redis -->
+  <g filter="url(#sh)">
+    <rect x="900" y="290" width="240" height="70" rx="10" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+  </g>
+  <text x="1020" y="318" font-size="15" font-weight="700" text-anchor="middle" fill="#7f1d1d">⚡ Managed Redis</text>
+  <text x="1020" y="338" font-size="12" text-anchor="middle" fill="#991b1b">Private endpoint :6379</text>
+
+  <!-- Public Gateway -->
+  <g filter="url(#sh)">
+    <rect x="900" y="400" width="240" height="80" rx="10" fill="#fef9c3" stroke="#ca8a04" stroke-width="2"/>
+  </g>
+  <text x="1020" y="424" font-size="15" font-weight="700" text-anchor="middle" fill="#713f12">🚪 Public Gateway</text>
+  <text x="1020" y="443" font-size="12" text-anchor="middle" fill="#854d0e">NAT – outbound internet (VM egress)</text>
+  <text x="1020" y="462" font-size="12" font-weight="600" text-anchor="middle" fill="#854d0e">🔐 SSH Bastion :61000</text>
+
+  <!-- Admin -->
+  <g filter="url(#sh)">
+    <rect x="930" y="605" width="180" height="55" rx="10" fill="#ffffff" stroke="#64748b" stroke-width="1.5"/>
+  </g>
+  <text x="1020" y="628" font-size="14" font-weight="700" text-anchor="middle" fill="#0f172a">👤 Admin / Ops</text>
+  <text x="1020" y="646" font-size="11" text-anchor="middle" fill="#475569">SSH key + IP allowlist</text>
+
+  <!-- Container Registry -->
+  <g filter="url(#sh)">
+    <rect x="590" y="30" width="210" height="65" rx="10" fill="#e0f2fe" stroke="#0284c7" stroke-width="2"/>
+  </g>
+  <text x="695" y="57" font-size="15" font-weight="700" text-anchor="middle" fill="#075985">📦 Container Registry</text>
+  <text x="695" y="77" font-size="12" text-anchor="middle" fill="#0369a1">Docker images</text>
+
+  <!-- Object Storage -->
+  <g filter="url(#sh)">
+    <rect x="850" y="30" width="210" height="65" rx="10" fill="#f3e8ff" stroke="#9333ea" stroke-width="2"/>
+  </g>
+  <text x="955" y="57" font-size="15" font-weight="700" text-anchor="middle" fill="#6b21a8">🗂️ Object Storage (S3)</text>
+  <text x="955" y="77" font-size="12" text-anchor="middle" fill="#7e22ce">Document storage</text>
+
+  <!-- Git repo -->
+  <g filter="url(#sh)">
+    <rect x="380" y="520" width="150" height="60" rx="10" fill="#ffffff" stroke="#64748b" stroke-width="1.5"/>
+  </g>
+  <text x="455" y="546" font-size="14" font-weight="600" text-anchor="middle" fill="#0f172a">📁 Git Repo</text>
+  <text x="455" y="565" font-size="12" text-anchor="middle" fill="#475569">Deploy manifests</text>
+
+  <!-- Mistral AI -->
+  <g filter="url(#sh)">
+    <rect x="1220" y="400" width="200" height="70" rx="10" fill="#ffffff" stroke="#64748b" stroke-width="1.5"/>
+  </g>
+  <text x="1320" y="428" font-size="15" font-weight="700" text-anchor="middle" fill="#0f172a">🤖 Mistral AI</text>
+  <text x="1320" y="448" font-size="12" text-anchor="middle" fill="#475569">Public API (HTTPS)</text>
+
+  <!-- OS patch repositories -->
+  <g filter="url(#sh)">
+    <rect x="1220" y="290" width="200" height="70" rx="10" fill="#ffffff" stroke="#64748b" stroke-width="1.5"/>
+  </g>
+  <text x="1320" y="318" font-size="15" font-weight="700" text-anchor="middle" fill="#0f172a">🩹 OS Patch Repos</text>
+  <text x="1320" y="338" font-size="12" text-anchor="middle" fill="#475569">apt / Docker Hub / updates</text>
+
+  <!-- Dedibox -->
+  <g filter="url(#sh)">
+    <rect x="1220" y="575" width="200" height="75" rx="10" fill="#f1f5f9" stroke="#334155" stroke-width="2"/>
+  </g>
+  <text x="1320" y="603" font-size="15" font-weight="700" text-anchor="middle" fill="#0f172a">🗄️ Dedibox Server</text>
+  <text x="1320" y="623" font-size="12" text-anchor="middle" fill="#334155">Cartography service</text>
+
+  <!-- Arrows -->
+  <g stroke="#475569" stroke-width="2" fill="none" marker-end="url(#arr)">
+    <line x1="160" y1="375" x2="198" y2="375"/>
+    <line x1="340" y1="375" x2="378" y2="375"/>
+    <line x1="530" y1="375" x2="598" y2="375"/>
+    <line x1="710" y1="450" x2="710" y2="488"/>
+    <path d="M820 310 C860 310 860 212 898 212"/>
+    <line x1="820" y1="325" x2="898" y2="325"/>
+    <path d="M820 430 C860 430 860 435 898 435"/>
+    <line x1="1140" y1="435" x2="1218" y2="435"/>
+    <path d="M1140 415 C1180 415 1180 325 1218 325"/>
+    <line x1="680" y1="290" x2="680" y2="97"/>
+    <path d="M760 290 C760 180 955 180 955 97"/>
+    <path d="M810 450 V585 H1218"/>
+    <path d="M530 550 C570 550 570 420 598 420"/>
+    <line x1="1020" y1="605" x2="1020" y2="482"/>
+  </g>
+  <!-- Bastion SSH to VM (dashed) -->
+  <path d="M898 470 H822" stroke="#ca8a04" stroke-width="2" stroke-dasharray="6 4" fill="none" marker-end="url(#arr)"/>
+
+  <!-- Arrow labels -->
+  <g font-size="11" fill="#334155">
+    <text x="535" y="365">HTTPS</text>
+    <text x="840" y="250">SQL</text>
+    <text x="838" y="318">cache</text>
+    <text x="1150" y="452">AI API</text>
+    <text x="832" y="450">egress</text>
+    <text x="1185" y="380">patching</text>
+    <text x="620" y="200" transform="rotate(-90 620 200)">pull images</text>
+    <text x="830" y="172">documents</text>
+    <text x="1060" y="580">HTTPS / IP allowlist → Dedibox</text>
+    <text x="1028" y="530">SSH :61000</text>
+    <text x="835" y="485" fill="#854d0e">SSH :22</text>
+    <text x="540" y="490">GitOps sync</text>
+  </g>
+
+  <!-- Legend -->
+  <g font-size="12" fill="#334155">
+    <rect x="30" y="625" width="14" height="14" fill="#fff7ed" stroke="#f97316"/><text x="50" y="637">Public edge</text>
+    <rect x="140" y="625" width="14" height="14" fill="#dbeafe" stroke="#2563eb"/><text x="160" y="637">Compute</text>
+    <rect x="235" y="625" width="14" height="14" fill="#dcfce7" stroke="#16a34a"/><text x="255" y="637">Managed DB</text>
+    <rect x="345" y="625" width="14" height="14" fill="#f3e8ff" stroke="#9333ea"/><text x="365" y="637">Storage</text>
+    <rect x="430" y="625" width="14" height="14" fill="#ffffff" stroke="#64748b"/><text x="450" y="637">External</text>
+  </g>
+</svg>

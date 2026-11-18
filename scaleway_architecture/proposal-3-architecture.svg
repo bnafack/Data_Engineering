@@ -1,0 +1,176 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1520 800" width="1520" height="800" font-family="Segoe UI, Arial, sans-serif" role="img" aria-label="Proposal 3 – Scaleway Kapsule Mutualized architecture diagram">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker>
+    <marker id="arrB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#326ce5"/></marker>
+    <marker id="arrP" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#4f0599"/></marker>
+    <filter id="sh" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.18"/></filter>
+  </defs>
+
+  <rect width="1520" height="800" fill="#f8fafc"/>
+  <text x="30" y="42" font-size="22" font-weight="700" fill="#0f172a">Proposal 3 – Scaleway Kapsule (Mutualized Kubernetes) + Generative APIs</text>
+
+  <!-- Scaleway cloud boundary -->
+  <rect x="190" y="70" width="1150" height="660" rx="16" fill="#faf5ff" stroke="#4f0599" stroke-width="2"/>
+  <rect x="190" y="70" width="1150" height="34" rx="16" fill="#4f0599"/>
+  <rect x="190" y="88" width="1150" height="16" fill="#4f0599"/>
+  <text x="210" y="93" font-size="15" font-weight="700" fill="#ffffff">☁️ Scaleway Cloud – Region fr-par</text>
+
+  <!-- Kapsule control plane (managed, mutualized) -->
+  <g filter="url(#sh)"><rect x="385" y="125" width="205" height="115" rx="10" fill="#e8eefc" stroke="#326ce5" stroke-width="2"/></g>
+  <text x="487" y="150" font-size="15" font-weight="700" text-anchor="middle" fill="#1e3a8a">☸️ Kapsule Control Plane</text>
+  <text x="487" y="170" font-size="12" font-weight="600" text-anchor="middle" fill="#326ce5">Mutualized – €0</text>
+  <text x="487" y="188" font-size="11" text-anchor="middle" fill="#1e40af">API server · scheduler · etcd 55 MB</text>
+  <text x="487" y="205" font-size="11" text-anchor="middle" fill="#1e40af">1 replica · no SLA · max 150 nodes</text>
+  <text x="487" y="223" font-size="11" text-anchor="middle" fill="#1e40af">Managed by Scaleway</text>
+
+  <!-- VPC -->
+  <rect x="570" y="210" width="560" height="425" rx="14" fill="#eef6ff" stroke="#3b82f6" stroke-width="2" stroke-dasharray="8 5"/>
+  <text x="590" y="232" font-size="14" font-weight="700" fill="#1d4ed8">VPC – Private Network</text>
+
+  <!-- Users / Admin / Git -->
+  <g filter="url(#sh)"><rect x="30" y="335" width="130" height="70" rx="10" fill="#ffffff" stroke="#64748b" stroke-width="1.5"/></g>
+  <text x="95" y="365" font-size="15" font-weight="600" text-anchor="middle" fill="#0f172a">🌐 Users</text>
+  <text x="95" y="385" font-size="12" text-anchor="middle" fill="#475569">Internet</text>
+
+  <g filter="url(#sh)"><rect x="30" y="515" width="140" height="70" rx="10" fill="#ffffff" stroke="#64748b" stroke-width="1.5"/></g>
+  <text x="100" y="542" font-size="14" font-weight="700" text-anchor="middle" fill="#0f172a">👤 Admin / Ops</text>
+  <text x="100" y="560" font-size="11" text-anchor="middle" fill="#475569">kubectl · Argo CD UI</text>
+  <text x="100" y="575" font-size="11" text-anchor="middle" fill="#475569">IAM + kubeconfig</text>
+
+  <g filter="url(#sh)"><rect x="30" y="650" width="140" height="60" rx="10" fill="#ffffff" stroke="#64748b" stroke-width="1.5"/></g>
+  <text x="100" y="676" font-size="14" font-weight="600" text-anchor="middle" fill="#0f172a">📁 Git Repo</text>
+  <text x="100" y="695" font-size="12" text-anchor="middle" fill="#475569">K8s manifests / Helm</text>
+
+  <!-- WAF / LB -->
+  <g filter="url(#sh)"><rect x="215" y="335" width="140" height="70" rx="10" fill="#fff7ed" stroke="#f97316" stroke-width="2"/></g>
+  <text x="285" y="365" font-size="15" font-weight="600" text-anchor="middle" fill="#9a3412">🛡️ WAF</text>
+  <text x="285" y="385" font-size="12" text-anchor="middle" fill="#9a3412">Protection on LB</text>
+
+  <g filter="url(#sh)"><rect x="385" y="330" width="150" height="80" rx="10" fill="#fff7ed" stroke="#f97316" stroke-width="2"/></g>
+  <text x="460" y="355" font-size="15" font-weight="600" text-anchor="middle" fill="#9a3412">⚖️ Load Balancer</text>
+  <text x="460" y="374" font-size="11" text-anchor="middle" fill="#9a3412">Public IP</text>
+  <text x="460" y="390" font-size="11" text-anchor="middle" fill="#9a3412">auto-created by K8s</text>
+  <text x="460" y="404" font-size="11" text-anchor="middle" fill="#9a3412">Service type=LoadBalancer</text>
+
+  <!-- Registry / S3 -->
+  <g filter="url(#sh)"><rect x="620" y="120" width="180" height="60" rx="10" fill="#e0f2fe" stroke="#0284c7" stroke-width="2"/></g>
+  <text x="710" y="145" font-size="15" font-weight="700" text-anchor="middle" fill="#075985">📦 Container Registry</text>
+  <text x="710" y="165" font-size="12" text-anchor="middle" fill="#0369a1">Docker images</text>
+
+  <g filter="url(#sh)"><rect x="850" y="120" width="190" height="60" rx="10" fill="#f3e8ff" stroke="#9333ea" stroke-width="2"/></g>
+  <text x="945" y="145" font-size="15" font-weight="700" text-anchor="middle" fill="#6b21a8">🗂️ Object Storage (S3)</text>
+  <text x="945" y="165" font-size="12" text-anchor="middle" fill="#7e22ce">Document storage</text>
+
+  <!-- Node pool -->
+  <g filter="url(#sh)"><rect x="590" y="242" width="290" height="328" rx="12" fill="#dbeafe" stroke="#326ce5" stroke-width="2"/></g>
+  <text x="735" y="264" font-size="14" font-weight="700" text-anchor="middle" fill="#1e3a8a">☸️ Kapsule Node Pool</text>
+  <text x="735" y="281" font-size="11" text-anchor="middle" fill="#1e40af">3 × BASIC3-X4C-8G · autoheal · placement group</text>
+
+  <!-- Node 1 -->
+  <rect x="602" y="292" width="266" height="84" rx="8" fill="#ffffff" stroke="#93c5fd"/>
+  <text x="614" y="311" font-size="12" font-weight="700" fill="#1e3a8a">🖥️ Node 1 · 4 vCPU / 8 GB</text>
+  <rect x="612" y="320" width="118" height="22" rx="5" fill="#dbeafe" stroke="#60a5fa"/><text x="671" y="335" font-size="11" text-anchor="middle" fill="#1e3a8a">🐳 App pod 4 GB</text>
+  <rect x="738" y="320" width="120" height="22" rx="5" fill="#fef3c7" stroke="#f59e0b"/><text x="798" y="335" font-size="11" text-anchor="middle" fill="#92400e">🔄 Argo CD</text>
+  <rect x="612" y="347" width="118" height="22" rx="5" fill="#ecfdf5" stroke="#34d399"/><text x="671" y="362" font-size="11" text-anchor="middle" fill="#065f46">🔀 Ingress</text>
+
+  <!-- Node 2 -->
+  <rect x="602" y="384" width="266" height="84" rx="8" fill="#ffffff" stroke="#93c5fd"/>
+  <text x="614" y="403" font-size="12" font-weight="700" fill="#1e3a8a">🖥️ Node 2 · 4 vCPU / 8 GB</text>
+  <rect x="612" y="412" width="118" height="22" rx="5" fill="#dbeafe" stroke="#60a5fa"/><text x="671" y="427" font-size="11" text-anchor="middle" fill="#1e3a8a">🐳 App pod 4 GB</text>
+  <rect x="738" y="412" width="120" height="22" rx="5" fill="#ecfdf5" stroke="#34d399"/><text x="798" y="427" font-size="11" text-anchor="middle" fill="#065f46">🔀 Ingress</text>
+  <rect x="612" y="439" width="118" height="22" rx="5" fill="#f1f5f9" stroke="#94a3b8"/><text x="671" y="454" font-size="11" text-anchor="middle" fill="#334155">🔐 cert-manager</text>
+
+  <!-- Node 3 -->
+  <rect x="602" y="476" width="266" height="84" rx="8" fill="#ffffff" stroke="#93c5fd"/>
+  <text x="614" y="495" font-size="12" font-weight="700" fill="#1e3a8a">🖥️ Node 3 · 4 vCPU / 8 GB</text>
+  <rect x="612" y="504" width="118" height="22" rx="5" fill="#dbeafe" stroke="#60a5fa"/><text x="671" y="519" font-size="11" text-anchor="middle" fill="#1e3a8a">🐳 App pod 4 GB</text>
+  <rect x="738" y="504" width="120" height="22" rx="5" fill="#f1f5f9" stroke="#94a3b8"/><text x="798" y="519" font-size="11" text-anchor="middle" fill="#334155">⚙️ Worker pods</text>
+
+  <!-- Block storage PVC -->
+  <g filter="url(#sh)"><rect x="600" y="582" width="240" height="40" rx="8" fill="#f3e8ff" stroke="#9333ea" stroke-width="2"/></g>
+  <text x="720" y="607" font-size="13" font-weight="600" text-anchor="middle" fill="#6b21a8">💽 Block Storage PVCs (CSI)</text>
+
+  <!-- PostgreSQL -->
+  <g filter="url(#sh)"><rect x="900" y="250" width="210" height="85" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/></g>
+  <text x="1005" y="273" font-size="15" font-weight="700" text-anchor="middle" fill="#14532d">🐘 Managed PostgreSQL</text>
+  <text x="1005" y="292" font-size="12" text-anchor="middle" fill="#166534">Block storage – 15k IOPS</text>
+  <text x="1005" y="309" font-size="12" text-anchor="middle" fill="#166534">Automatic backups</text>
+  <text x="1005" y="326" font-size="12" text-anchor="middle" fill="#166534">Private endpoint :5432</text>
+
+  <!-- Redis -->
+  <g filter="url(#sh)"><rect x="900" y="350" width="210" height="60" rx="10" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/></g>
+  <text x="1005" y="375" font-size="15" font-weight="700" text-anchor="middle" fill="#7f1d1d">⚡ Managed Redis</text>
+  <text x="1005" y="395" font-size="12" text-anchor="middle" fill="#991b1b">Private endpoint :6379</text>
+
+  <!-- Public Gateway -->
+  <g filter="url(#sh)"><rect x="900" y="430" width="210" height="80" rx="10" fill="#fef9c3" stroke="#ca8a04" stroke-width="2"/></g>
+  <text x="1005" y="455" font-size="15" font-weight="700" text-anchor="middle" fill="#713f12">🚪 Public Gateway</text>
+  <text x="1005" y="474" font-size="12" text-anchor="middle" fill="#854d0e">NAT – outbound internet</text>
+  <text x="1005" y="492" font-size="11" text-anchor="middle" fill="#854d0e">image pulls · Git · AI calls</text>
+
+  <!-- Generative APIs -->
+  <g filter="url(#sh)"><rect x="1155" y="240" width="170" height="105" rx="10" fill="#ede9fe" stroke="#4f0599" stroke-width="2"/></g>
+  <text x="1240" y="265" font-size="15" font-weight="700" text-anchor="middle" fill="#4f0599">🧠 Generative APIs</text>
+  <text x="1240" y="285" font-size="12" text-anchor="middle" fill="#4f0599">Mistral models</text>
+  <text x="1240" y="303" font-size="12" text-anchor="middle" fill="#4f0599">OpenAI-compatible API</text>
+  <text x="1240" y="321" font-size="12" text-anchor="middle" fill="#4f0599">IAM API key · EU hosted</text>
+
+  <!-- Dedibox -->
+  <g filter="url(#sh)"><rect x="1155" y="520" width="170" height="75" rx="10" fill="#f1f5f9" stroke="#334155" stroke-width="2"/></g>
+  <text x="1240" y="550" font-size="15" font-weight="700" text-anchor="middle" fill="#0f172a">🗄️ Dedibox</text>
+  <text x="1240" y="570" font-size="12" text-anchor="middle" fill="#334155">Cartography service</text>
+
+  <!-- Internet -->
+  <g filter="url(#sh)"><rect x="1365" y="435" width="140" height="70" rx="10" fill="#ffffff" stroke="#64748b" stroke-width="1.5"/></g>
+  <text x="1435" y="462" font-size="14" font-weight="700" text-anchor="middle" fill="#0f172a">🌍 Internet</text>
+  <text x="1435" y="482" font-size="11" text-anchor="middle" fill="#475569">Docker Hub / Git host</text>
+
+  <!-- Arrows -->
+  <g stroke="#475569" stroke-width="2" fill="none" marker-end="url(#arr)">
+    <line x1="160" y1="370" x2="213" y2="370"/>
+    <line x1="355" y1="370" x2="383" y2="370"/>
+    <line x1="535" y1="370" x2="588" y2="370"/>
+    <line x1="720" y1="570" x2="720" y2="580"/>
+    <line x1="880" y1="292" x2="898" y2="292"/>
+    <line x1="880" y1="380" x2="898" y2="380"/>
+    <line x1="880" y1="470" x2="898" y2="470"/>
+    <line x1="650" y1="242" x2="650" y2="182"/>
+    <path d="M840 242 C840 205 945 210 945 182"/>
+    <path d="M862 570 V650 H1240 V597"/>
+    <path d="M170 680 H578 V331 H588"/>
+    <line x1="1110" y1="490" x2="1363" y2="490"/>
+  </g>
+  <!-- Admin to control plane, control plane to nodes -->
+  <path d="M170 540 H362 V182 H383" stroke="#326ce5" stroke-width="2" fill="none" marker-end="url(#arrB)"/>
+  <path d="M590 195 H735 V240" stroke="#326ce5" stroke-width="2" stroke-dasharray="6 4" fill="none" marker-end="url(#arrB)"/>
+  <!-- Gateway to Generative APIs -->
+  <path d="M1110 450 C1140 450 1135 300 1153 300" stroke="#4f0599" stroke-width="2.5" fill="none" marker-end="url(#arrP)"/>
+
+  <!-- Labels -->
+  <g font-size="11" fill="#334155">
+    <text x="540" y="362">HTTPS</text>
+    <text x="196" y="532" fill="#326ce5" font-weight="600">kubectl :6443 (IP ACL)</text>
+    <text x="605" y="207" fill="#326ce5">manages nodes</text>
+    <text x="638" y="225" transform="rotate(-90 638 225)">pull</text>
+    <text x="852" y="205">documents</text>
+    <text x="881" y="286" font-size="9">SQL</text>
+    <text x="881" y="374" font-size="9">cache</text>
+    <text x="881" y="464" font-size="9">egress</text>
+    <text x="900" y="645">HTTPS (IP allowlist / private link)</text>
+    <text x="230" y="673">GitOps sync → Argo CD (pull)</text>
+    <text x="1180" y="482">egress</text>
+    <text x="1118" y="380" fill="#4f0599" font-weight="600">AI calls</text>
+  </g>
+
+  <!-- Legend -->
+  <g font-size="12" fill="#334155">
+    <rect x="30" y="760" width="14" height="14" fill="#faf5ff" stroke="#4f0599"/><text x="50" y="772">Scaleway Cloud</text>
+    <rect x="160" y="760" width="14" height="14" fill="#e8eefc" stroke="#326ce5"/><text x="180" y="772">Kubernetes (Kapsule)</text>
+    <rect x="320" y="760" width="14" height="14" fill="#fff7ed" stroke="#f97316"/><text x="340" y="772">Public edge</text>
+    <rect x="430" y="760" width="14" height="14" fill="#dcfce7" stroke="#16a34a"/><text x="450" y="772">Managed DB</text>
+    <rect x="540" y="760" width="14" height="14" fill="#f3e8ff" stroke="#9333ea"/><text x="560" y="772">Storage</text>
+    <rect x="625" y="760" width="14" height="14" fill="#ede9fe" stroke="#4f0599"/><text x="645" y="772">AI (Generative APIs)</text>
+    <rect x="785" y="760" width="14" height="14" fill="#ffffff" stroke="#64748b"/><text x="805" y="772">External / Internet</text>
+    <text x="960" y="772" font-weight="600">Est. node pool: €187.71/mo · control plane €0</text>
+  </g>
+</svg>
