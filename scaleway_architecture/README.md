@@ -26,6 +26,8 @@ Chaque proposition existe en deux formats : SVG (image) et draw.io (modifiable).
 | P3 | `proposal-3-architecture.svg` / `.drawio` | **Kubernetes Kapsule Mutualisé** (3 nœuds BASIC3-X4C-8G) + Argo CD, services managés |
 | P4 | `proposal-4-architecture.svg` / `.drawio` | **Serverless Containers** en entrée privée uniquement, derrière le NLB + WAF |
 | P5 | `proposal-5-architecture.svg` / `.drawio` | **VPS Dedibox unique** (VPS-START-2-XXL), PostgreSQL et Redis auto-hébergés, DNS chez LWS, sans WAF, SSH exposé |
+| P6 | `proposal-6-architecture.svg` / `.drawio` | Comme P2, mais la VM est remplacée par un serveur **Elastic Metal EM-A410X-SSD** (6C/12T, 64 Go, 2 × 1 To SSD en RAID 1, 54,99 €/mois) en réseau privé. Prise en charge du Private Network et du NLB à vérifier |
+| P7 | `proposal-7-architecture.svg` / `.drawio` | Comme P6, **sans Redis managé**, et le service de cartographie passe sur un serveur **Elastic Metal EM-B420E-NVMe** (EPYC 7272, 12C/24T, 128 Go, 2 × 1 To NVMe, 159,99 € + 19,99 € d'option Private Network 10 Gbps) dans le réseau privé. Alternative moins chère : EM-B212X-SSD (256 Go, 115,99 € + 9,99 €) |
 
 ## 3. Comparaison
 
