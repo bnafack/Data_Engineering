@@ -1,0 +1,166 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1520 800" width="1520" height="800" font-family="Segoe UI, Arial, sans-serif" role="img" aria-label="Proposal 6 – Elastic Metal server in private network behind NLB and WAF">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker>
+    <marker id="arrY" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#ca8a04"/></marker>
+    <marker id="arrP" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#4f0599"/></marker>
+    <filter id="sh" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.18"/></filter>
+  </defs>
+
+  <rect width="1520" height="800" fill="#f8fafc"/>
+  <text x="30" y="42" font-size="22" font-weight="700" fill="#0f172a">Proposal 6 – Elastic Metal EM-A410X-SSD (private) behind NLB + WAF · Generative APIs</text>
+
+  <!-- Scaleway cloud boundary -->
+  <rect x="190" y="70" width="1150" height="650" rx="16" fill="#faf5ff" stroke="#4f0599" stroke-width="2"/>
+  <rect x="190" y="70" width="1150" height="34" rx="16" fill="#4f0599"/>
+  <rect x="190" y="88" width="1150" height="16" fill="#4f0599"/>
+  <text x="210" y="93" font-size="15" font-weight="700" fill="#ffffff">☁️ Scaleway Cloud – Region fr-par (PAR 1)</text>
+
+  <!-- VPC -->
+  <rect x="570" y="200" width="560" height="400" rx="14" fill="#eef6ff" stroke="#3b82f6" stroke-width="2" stroke-dasharray="8 5"/>
+  <text x="585" y="590" font-size="14" font-weight="700" fill="#1d4ed8">VPC – Private Network (no public IP on the server)</text>
+
+  <!-- Users -->
+  <g filter="url(#sh)"><rect x="30" y="335" width="130" height="70" rx="10" fill="#ffffff" stroke="#64748b" stroke-width="1.5"/></g>
+  <text x="95" y="365" font-size="15" font-weight="600" text-anchor="middle" fill="#0f172a">🌐 Users</text>
+  <text x="95" y="385" font-size="12" text-anchor="middle" fill="#475569">Internet</text>
+
+  <!-- Admin -->
+  <g filter="url(#sh)"><rect x="30" y="530" width="140" height="65" rx="10" fill="#ffffff" stroke="#64748b" stroke-width="1.5"/></g>
+  <text x="100" y="557" font-size="14" font-weight="700" text-anchor="middle" fill="#0f172a">👤 Admin / Ops</text>
+  <text x="100" y="576" font-size="11" text-anchor="middle" fill="#475569">SSH key + IP allowlist</text>
+
+  <!-- Git -->
+  <g filter="url(#sh)"><rect x="30" y="640" width="140" height="60" rx="10" fill="#ffffff" stroke="#64748b" stroke-width="1.5"/></g>
+  <text x="100" y="666" font-size="14" font-weight="600" text-anchor="middle" fill="#0f172a">📁 Git Repo</text>
+  <text x="100" y="685" font-size="12" text-anchor="middle" fill="#475569">Deploy manifests</text>
+
+  <!-- WAF -->
+  <g filter="url(#sh)"><rect x="215" y="335" width="140" height="70" rx="10" fill="#fff7ed" stroke="#f97316" stroke-width="2"/></g>
+  <text x="285" y="365" font-size="15" font-weight="600" text-anchor="middle" fill="#9a3412">🛡️ WAF</text>
+  <text x="285" y="385" font-size="12" text-anchor="middle" fill="#9a3412">Protection on LB</text>
+
+  <!-- Network LB -->
+  <g filter="url(#sh)"><rect x="385" y="330" width="150" height="80" rx="10" fill="#fff7ed" stroke="#f97316" stroke-width="2"/></g>
+  <text x="460" y="357" font-size="15" font-weight="600" text-anchor="middle" fill="#9a3412">⚖️ Network LB</text>
+  <text x="460" y="377" font-size="12" text-anchor="middle" fill="#9a3412">L4 / TCP</text>
+  <text x="460" y="395" font-size="12" text-anchor="middle" fill="#9a3412">Public IP</text>
+
+  <!-- Container Registry -->
+  <g filter="url(#sh)"><rect x="590" y="120" width="180" height="60" rx="10" fill="#e0f2fe" stroke="#0284c7" stroke-width="2"/></g>
+  <text x="680" y="145" font-size="15" font-weight="700" text-anchor="middle" fill="#075985">📦 Container Registry</text>
+  <text x="680" y="165" font-size="12" text-anchor="middle" fill="#0369a1">Docker images</text>
+
+  <!-- Object Storage -->
+  <g filter="url(#sh)"><rect x="820" y="120" width="190" height="60" rx="10" fill="#f3e8ff" stroke="#9333ea" stroke-width="2"/></g>
+  <text x="915" y="145" font-size="15" font-weight="700" text-anchor="middle" fill="#6b21a8">🗂️ Object Storage (S3)</text>
+  <text x="915" y="165" font-size="12" text-anchor="middle" fill="#7e22ce">documents + backups</text>
+
+  <!-- Elastic Metal server -->
+  <g filter="url(#sh)"><rect x="590" y="250" width="250" height="260" rx="12" fill="#dbeafe" stroke="#2563eb" stroke-width="2.5"/></g>
+  <text x="715" y="273" font-size="14" font-weight="700" text-anchor="middle" fill="#1e3a8a">🖥️ Elastic Metal EM-A410X-SSD</text>
+  <text x="715" y="290" font-size="11" text-anchor="middle" fill="#1e40af">Xeon E5-1650 · 6C/12T · 64 GB RAM</text>
+  <rect x="605" y="302" width="220" height="34" rx="6" fill="#ffffff" stroke="#93c5fd"/>
+  <text x="715" y="324" font-size="12" text-anchor="middle" fill="#1e3a8a">🐳 Docker – app containers (3 × 4 GB)</text>
+  <rect x="605" y="342" width="220" height="34" rx="6" fill="#ffffff" stroke="#93c5fd"/>
+  <text x="715" y="364" font-size="12" text-anchor="middle" fill="#1e3a8a">🔄 Argo CD (k3s)</text>
+  <rect x="605" y="382" width="220" height="50" rx="6" fill="#f3e8ff" stroke="#9333ea"/>
+  <text x="715" y="402" font-size="12" font-weight="600" text-anchor="middle" fill="#6b21a8">💽 2 × 1 TB SSD · RAID 1 (mdadm)</text>
+  <text x="715" y="420" font-size="10" text-anchor="middle" fill="#7e22ce">OS · images · volumes (local, not replicated)</text>
+  <text x="715" y="454" font-size="11" text-anchor="middle" fill="#1e40af">Private IP only (Private Network)</text>
+  <text x="715" y="472" font-size="10" text-anchor="middle" fill="#b45309">to verify: Private Network + LB backend</text>
+  <text x="715" y="490" font-size="10" text-anchor="middle" fill="#1e40af">€54.99 / month</text>
+
+  <!-- PostgreSQL -->
+  <g filter="url(#sh)"><rect x="880" y="240" width="230" height="85" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/></g>
+  <text x="995" y="263" font-size="15" font-weight="700" text-anchor="middle" fill="#14532d">🐘 Managed PostgreSQL</text>
+  <text x="995" y="282" font-size="12" text-anchor="middle" fill="#166534">Block storage – 15k IOPS</text>
+  <text x="995" y="299" font-size="12" text-anchor="middle" fill="#166534">Automatic backups</text>
+  <text x="995" y="316" font-size="12" text-anchor="middle" fill="#166534">Private endpoint :5432</text>
+
+  <!-- Redis -->
+  <g filter="url(#sh)"><rect x="880" y="340" width="230" height="60" rx="10" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/></g>
+  <text x="995" y="365" font-size="15" font-weight="700" text-anchor="middle" fill="#7f1d1d">⚡ Managed Redis</text>
+  <text x="995" y="385" font-size="12" text-anchor="middle" fill="#991b1b">Private endpoint :6379</text>
+
+  <!-- Public Gateway + Bastion -->
+  <g filter="url(#sh)"><rect x="880" y="420" width="230" height="95" rx="10" fill="#fef9c3" stroke="#ca8a04" stroke-width="2"/></g>
+  <text x="995" y="445" font-size="15" font-weight="700" text-anchor="middle" fill="#713f12">🚪 Public Gateway</text>
+  <text x="995" y="465" font-size="12" text-anchor="middle" fill="#854d0e">NAT – outbound (patching, AI)</text>
+  <rect x="905" y="475" width="180" height="28" rx="6" fill="#ffffff" stroke="#ca8a04"/>
+  <text x="995" y="494" font-size="12" font-weight="700" text-anchor="middle" fill="#854d0e">🔐 SSH Bastion :61000</text>
+
+  <!-- Generative APIs -->
+  <g filter="url(#sh)"><rect x="1155" y="225" width="170" height="105" rx="10" fill="#ede9fe" stroke="#4f0599" stroke-width="2"/></g>
+  <text x="1240" y="250" font-size="15" font-weight="700" text-anchor="middle" fill="#4f0599">🧠 Generative APIs</text>
+  <text x="1240" y="270" font-size="12" text-anchor="middle" fill="#4f0599">Mistral models</text>
+  <text x="1240" y="288" font-size="12" text-anchor="middle" fill="#4f0599">OpenAI-compatible API</text>
+  <text x="1240" y="306" font-size="12" text-anchor="middle" fill="#4f0599">IAM API key · EU hosted</text>
+
+  <!-- OS patch repos -->
+  <g filter="url(#sh)"><rect x="1155" y="425" width="170" height="70" rx="10" fill="#ffffff" stroke="#64748b" stroke-width="1.5"/></g>
+  <text x="1240" y="452" font-size="14" font-weight="700" text-anchor="middle" fill="#0f172a">🩹 OS Patch Repos</text>
+  <text x="1240" y="472" font-size="11" text-anchor="middle" fill="#475569">apt / Docker Hub</text>
+
+  <!-- Dedibox -->
+  <g filter="url(#sh)"><rect x="1155" y="520" width="170" height="75" rx="10" fill="#f1f5f9" stroke="#334155" stroke-width="2"/></g>
+  <text x="1240" y="550" font-size="15" font-weight="700" text-anchor="middle" fill="#0f172a">🗄️ Dedibox</text>
+  <text x="1240" y="570" font-size="12" text-anchor="middle" fill="#334155">Cartography service</text>
+
+  <!-- Trade-offs note -->
+  <rect x="215" y="580" width="340" height="82" rx="10" fill="#fff7ed" stroke="#f59e0b"/>
+  <text x="227" y="598" font-size="12" font-weight="700" fill="#92400e">⚠️ Trade-offs vs. a VM</text>
+  <text x="227" y="614" font-size="10.5" fill="#78350f">• Single server: repair takes hours, no live migration</text>
+  <text x="227" y="629" font-size="10.5" fill="#78350f">• Fixed size, cannot be resized</text>
+  <text x="227" y="644" font-size="10.5" fill="#78350f">• Local disks only: state stays in managed DB / S3</text>
+  <text x="227" y="659" font-size="10.5" fill="#78350f">• Optional: 2nd server behind the NLB for redundancy</text>
+
+  <!-- Arrows -->
+  <g stroke="#475569" stroke-width="2" fill="none" marker-end="url(#arr)">
+    <line x1="160" y1="370" x2="213" y2="370"/>
+    <line x1="355" y1="370" x2="383" y2="370"/>
+    <line x1="535" y1="370" x2="588" y2="370"/>
+    <line x1="680" y1="250" x2="680" y2="182"/>
+    <path d="M780 250 C780 205 915 215 915 182"/>
+    <path d="M842 282 H878"/>
+    <path d="M842 370 H878"/>
+    <path d="M842 440 H878"/>
+    <path d="M800 510 V615 H1240 V597"/>
+    <path d="M170 690 H575 V470 H588"/>
+    <path d="M170 562 H866 V489 H903"/>
+    <line x1="1110" y1="460" x2="1153" y2="460"/>
+    <line x1="100" y1="640" x2="100" y2="597"/>
+  </g>
+  <!-- Bastion SSH to server (dashed) -->
+  <path d="M903 505 H842" stroke="#ca8a04" stroke-width="2" stroke-dasharray="6 4" fill="none" marker-end="url(#arrY)"/>
+  <!-- Gateway to Generative APIs -->
+  <path d="M1110 435 C1140 435 1135 290 1153 290" stroke="#4f0599" stroke-width="2.5" fill="none" marker-end="url(#arrP)"/>
+
+  <!-- Labels -->
+  <g font-size="11" fill="#334155">
+    <text x="540" y="362">HTTPS</text>
+    <text x="846" y="276" font-size="9">SQL</text>
+    <text x="846" y="364" font-size="9">cache</text>
+    <text x="846" y="434" font-size="9">egress</text>
+    <text x="846" y="520" font-size="9" fill="#854d0e">SSH :22</text>
+    <text x="668" y="225" transform="rotate(-90 668 225)">pull images</text>
+    <text x="830" y="205">documents</text>
+    <text x="900" y="632">HTTPS (IP allowlist / private link)</text>
+    <text x="230" y="683">GitOps sync</text>
+    <text x="190" y="555">SSH :61000 → bastion</text>
+    <text x="1125" y="452">patching</text>
+    <text x="1118" y="360" fill="#4f0599" font-weight="600">AI calls</text>
+  </g>
+
+  <!-- Legend -->
+  <g font-size="12" fill="#334155">
+    <rect x="30" y="745" width="14" height="14" fill="#faf5ff" stroke="#4f0599"/><text x="50" y="757">Scaleway Cloud</text>
+    <rect x="160" y="745" width="14" height="14" fill="#fff7ed" stroke="#f97316"/><text x="180" y="757">Public edge</text>
+    <rect x="270" y="745" width="14" height="14" fill="#dbeafe" stroke="#2563eb"/><text x="290" y="757">Elastic Metal</text>
+    <rect x="385" y="745" width="14" height="14" fill="#dcfce7" stroke="#16a34a"/><text x="405" y="757">Managed DB</text>
+    <rect x="495" y="745" width="14" height="14" fill="#f3e8ff" stroke="#9333ea"/><text x="515" y="757">Storage</text>
+    <rect x="580" y="745" width="14" height="14" fill="#ede9fe" stroke="#4f0599"/><text x="600" y="757">AI (Generative APIs)</text>
+    <line x1="740" y1="752" x2="770" y2="752" stroke="#ca8a04" stroke-width="2" stroke-dasharray="6 4"/><text x="776" y="757">Admin SSH via bastion</text>
+    <rect x="930" y="745" width="14" height="14" fill="#ffffff" stroke="#64748b"/><text x="950" y="757">External</text>
+    <text x="1030" y="757" font-weight="600">Server €54.99/mo + LB, Gateway, managed DB / Redis</text>
+  </g>
+</svg>
