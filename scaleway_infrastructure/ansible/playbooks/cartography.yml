@@ -1,0 +1,14 @@
+---
+- name: Import the environment guard
+  ansible.builtin.import_playbook: guard.yml
+
+# Baseline (base, network, docker) comes from site.yml or the individual playbooks.
+- name: Cartography server layout
+  hosts: cartography
+  become: true
+  gather_facts: true
+  any_errors_fatal: true
+  max_fail_percentage: 0
+  roles:
+    - role: cartography
+      tags: [cartography]

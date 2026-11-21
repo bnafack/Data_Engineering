@@ -1,0 +1,11 @@
+# Remote state on Scaleway Object Storage (one state per environment).
+# Copy this file to backend.tf to enable it. The bucket, key and endpoint are NOT
+# set here: they come from envs/<env>.backend.hcl (see envs/*.backend.hcl.example),
+# so dev and prod each get their own state. No Terraform workspaces are used.
+#
+# Requires Terraform >= 1.10 for use_lockfile (older versions: remove it and
+# use `endpoint` / `force_path_style` instead of `endpoints` / `use_path_style`).
+
+terraform {
+  backend "s3" {}
+}

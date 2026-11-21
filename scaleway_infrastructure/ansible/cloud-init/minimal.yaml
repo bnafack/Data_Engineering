@@ -1,0 +1,21 @@
+#cloud-config
+# OPTIONAL, minimal first-boot file. Ansible does NOT need it.
+# Purpose: an admin user with your SSH keys and python3 so Ansible can connect.
+# Elastic Metal cloud-init support is UNVERIFIED. Changing cloud_init on an existing server may force a reinstall.
+#
+# Pass it to Terraform (tfvars files cannot call file(), so use an environment variable):
+#   TF_VAR_app_cloud_init="$(cat ../ansible/cloud-init/minimal.yaml)" \
+#   TF_VAR_cartography_cloud_init="$(cat ../ansible/cloud-init/minimal.yaml)" ./tf.sh dev plan
+# or, in a .tf override: app_cloud_init = file("${path.module}/../ansible/cloud-init/minimal.yaml")
+# Replace the key placeholders below with your public keys (public keys are not secrets).
+users:
+  - name: ubuntu
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    lock_passwd: true
+    ssh_authorized_keys:
+      - "ssh-ed25519 AAAA_REPLACE_ME alice@example"
+      - "ssh-ed25519 AAAA_REPLACE_ME bob@example"
+package_update: true
+packages:
+  - python3

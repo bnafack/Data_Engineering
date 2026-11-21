@@ -1,0 +1,40 @@
+---
+# Per-group switch (set docker_enabled: false in group_vars to skip a group).
+docker_enabled: true
+
+# Docker apt repository. The suite defaults to the OS codename; fall back to "noble" if Docker
+# does not publish packages for your release (UNVERIFIED for Ubuntu 26.04 "resolute" on the target).
+docker_apt_uri: https://download.docker.com/linux/ubuntu
+docker_apt_key_url: https://download.docker.com/linux/ubuntu/gpg
+docker_apt_suite: "{{ ansible_facts['distribution_release'] }}"
+docker_apt_arch: "{{ {'x86_64': 'amd64', 'aarch64': 'arm64'}[ansible_facts['architecture']] }}"
+
+# Version pin for docker-ce and docker-ce-cli (apt wildcard allowed). Never unpinned.
+# Docker's repo published 5:29.x for 26.04 when this was written. To upgrade, change it and re-run the tag docker.
+docker_version: "5:29.*"
+
+docker_packages:
+  - "docker-ce={{ docker_version }}"
+  - "docker-ce-cli={{ docker_version }}"
+  - containerd.io
+  - docker-buildx-plugin
+  - docker-compose-plugin
+
+# Remove distribution packages that conflict with Docker's.
+docker_remove_conflicting: true
+docker_conflicting_packages:
+  - docker.io
+  - docker-compose
+  - docker-doc
+  - podman-docker
+  - runc
+
+# Members of the docker group have root-equivalent access. Empty by default.
+docker_users: []
+
+docker_daemon_config:
+  log-driver: json-file
+  log-opts:
+    max-size: 10m
+    max-file: "3"
+  live-restore: true

@@ -1,0 +1,41 @@
+---
+- name: Check inputs
+  ansible.builtin.assert:
+    that:
+      - base_private_cidr is defined
+      - base_admin_cidrs | length > 0 or base_firewall_relaxed | bool
+      - base_ssh_port | int == (ansible_port | default(22) | int)
+    fail_msg: >-
+      Set private_network_cidr (terraform.yml) and a non-empty admin_cidrs, or base_firewall_relaxed=true for the first run.
+      base_ssh_port must equal the port Ansible connects to.
+    quiet: true
+  tags: [base, always]
+
+- name: Packages
+  ansible.builtin.import_tasks: packages.yml
+  tags: [base, packages]
+
+- name: Time
+  ansible.builtin.import_tasks: time.yml
+  tags: [base, packages]
+
+- name: Automatic updates
+  ansible.builtin.import_tasks: unattended.yml
+  tags: [base, packages]
+
+- name: SSH hardening
+  ansible.builtin.import_tasks: ssh.yml
+  when: base_ssh_harden | bool
+  tags: [base, ssh]
+
+- name: Fail2ban
+  ansible.builtin.import_tasks: fail2ban.yml
+  tags: [base, ssh]
+
+- name: Kernel parameters
+  ansible.builtin.import_tasks: sysctl.yml
+  tags: [base]
+
+- name: Host firewall
+  ansible.builtin.import_tasks: firewall.yml
+  tags: [base, firewall]

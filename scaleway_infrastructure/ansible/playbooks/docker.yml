@@ -1,0 +1,14 @@
+---
+- name: Import the environment guard
+  ansible.builtin.import_playbook: guard.yml
+
+- name: Docker Engine
+  hosts: servers
+  become: true
+  gather_facts: true
+  any_errors_fatal: true
+  max_fail_percentage: 0
+  roles:
+    - role: docker
+      when: docker_enabled | default(true) | bool
+      tags: [docker]

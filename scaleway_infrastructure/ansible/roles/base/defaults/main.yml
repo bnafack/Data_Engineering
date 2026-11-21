@@ -1,0 +1,62 @@
+---
+# Baseline role. Environment values come from inventories/<env>/group_vars/all/.
+
+# Packages installed on every server.
+base_packages:
+  - ca-certificates
+  - chrony
+  - curl
+  - fail2ban
+  - gnupg
+  - htop
+  - jq
+  - rsync
+  - ufw
+  - unattended-upgrades
+  - vim
+  - python3
+
+base_timezone: "{{ timezone | default('Etc/UTC') }}"
+
+# Account used by Ansible. Must already have a non-empty authorized_keys (checked before SSH hardening).
+base_admin_user: "{{ ansible_user }}"
+
+# --- SSH hardening -----------------------------------------------------------
+base_ssh_port: 22
+base_ssh_harden: true
+base_ssh_max_auth_tries: 3
+
+# --- Host firewall (ufw) -----------------------------------------------------
+# Bare-metal servers always have a public IPv4, so the host firewall is the only barrier.
+# SSH is allowed from these CIDRs (same idea as Terraform bastion_allowed_cidrs) and from the Private Network.
+base_admin_cidrs: "{{ admin_cidrs | default([]) }}"
+# Private Network CIDR (Terraform output private_network_cidr, written to terraform.yml).
+base_private_cidr: "{{ private_network_cidr }}"
+# First-run escape hatch: also allow SSH from anywhere. Keep false in normal use.
+base_firewall_relaxed: false
+# Set false to configure rules without enabling ufw.
+base_firewall_enable: true
+# Public ports served through the Network Load Balancer. Allowed ONLY from base_lb_source_cidrs.
+base_lb_ports: [80, 443]
+# Source CIDRs allowed on base_lb_ports. The L4 NLB passthrough is expected to reach the server from the Private
+# Network. UNVERIFIED: if the NLB preserves client IPs, packets will not match this and you must adapt it.
+base_lb_source_cidrs:
+  - "{{ base_private_cidr }}"
+# Extra TCP ports opened to the Private Network only (for example app server <-> cartography traffic).
+base_private_allowed_tcp_ports: []
+# Guard against DNAT bypass: Docker published ports and k3s hostPorts are NATed before ufw INPUT rules apply.
+# This adds an iptables raw-table drop for base_lb_ports arriving on the public interface from non-allowed sources.
+base_public_dnat_guard: true
+# Public network interface (default: the interface of the default route).
+base_public_interface: "{{ ansible_facts['default_ipv4']['interface'] | default('') }}"
+# Safety net on the first ufw enable: a transient systemd timer disables ufw after N seconds unless it is
+# stopped once the SSH connection is confirmed. 0 disables the safety net.
+base_firewall_rollback_seconds: 120
+
+# --- Automatic updates -------------------------------------------------------
+base_unattended_auto_reboot: false
+
+# --- fail2ban ----------------------------------------------------------------
+base_fail2ban_maxretry: 5
+base_fail2ban_bantime: 1h
+base_fail2ban_findtime: 10m

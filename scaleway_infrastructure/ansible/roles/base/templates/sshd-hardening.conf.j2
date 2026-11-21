@@ -1,0 +1,11 @@
+# Managed by Ansible (role base). Key-only SSH, no root login.
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+PermitRootLogin no
+PubkeyAuthentication yes
+X11Forwarding no
+MaxAuthTries {{ base_ssh_max_auth_tries }}
+# Needed for "ssh -L" (kubeconfig / database tunnels) and "ssh -J".
+AllowTcpForwarding yes
+ClientAliveInterval 300
+ClientAliveCountMax 2

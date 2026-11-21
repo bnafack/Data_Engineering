@@ -1,0 +1,10 @@
+# Local state, one file per environment: states/<env>/terraform.tfstate.
+# Copy this file to backend.tf to enable it. tf.sh sets the path for you.
+# No Terraform workspaces are used.
+#
+# The state holds the database passwords and stays on your machine (git-ignored).
+# Fine for a first try; use backend.s3.tf.example for a team or for prod.
+
+terraform {
+  backend "local" {}
+}

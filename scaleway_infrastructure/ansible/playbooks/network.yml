@@ -1,0 +1,24 @@
+---
+- name: Import the environment guard
+  ansible.builtin.import_playbook: guard.yml
+
+- name: Private Network VLAN interface (opt-in, UNVERIFIED)
+  hosts: servers
+  become: true
+  gather_facts: true
+  any_errors_fatal: true
+  max_fail_percentage: 0
+  tasks:
+    - name: Explain why the network role is skipped
+      ansible.builtin.debug:
+        msg: "network_configure is false: skipping the Private Network interface. Set it to true in the environment variables to enable it."
+      when: not (network_configure | default(false) | bool)
+      tags: [network]
+
+    - name: Configure the Private Network interface
+      ansible.builtin.include_role:
+        name: network
+        apply:
+          tags: [network]
+      when: network_configure | default(false) | bool
+      tags: [network]

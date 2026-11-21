@@ -1,0 +1,19 @@
+---
+# net.ipv4.ip_forward is NOT set here: k3s and Docker manage it.
+- name: Network hardening sysctls
+  ansible.posix.sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    sysctl_file: /etc/sysctl.d/90-base-hardening.conf
+    state: present
+    reload: true
+  loop:
+    - { name: net.ipv4.tcp_syncookies, value: "1" }
+    # Loose reverse-path filter: the server has a public NIC and a Private Network VLAN.
+    - { name: net.ipv4.conf.all.rp_filter, value: "2" }
+    - { name: net.ipv4.conf.default.rp_filter, value: "2" }
+    - { name: net.ipv4.conf.all.accept_redirects, value: "0" }
+    - { name: net.ipv4.conf.default.accept_redirects, value: "0" }
+    - { name: net.ipv4.conf.all.send_redirects, value: "0" }
+  loop_control:
+    label: "{{ item.name }}"

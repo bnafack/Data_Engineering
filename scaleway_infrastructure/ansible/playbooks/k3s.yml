@@ -1,0 +1,14 @@
+---
+- name: Import the environment guard
+  ansible.builtin.import_playbook: guard.yml
+
+# Needs the base playbook to have run first (firewall rules are added to the existing ufw).
+- name: K3s on the app server only
+  hosts: app
+  become: true
+  gather_facts: true
+  any_errors_fatal: true
+  max_fail_percentage: 0
+  roles:
+    - role: k3s
+      tags: [k3s]

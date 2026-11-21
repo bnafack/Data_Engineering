@@ -1,0 +1,18 @@
+# Remote state for DEV. Copy to envs/dev.backend.hcl (git-ignored).
+# Use a PRIVATE, encrypted bucket: state contains the database passwords.
+# Credentials: AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY = your Scaleway keys.
+# Best practice: a dedicated state bucket per environment (ideally in each environment's project).
+bucket = "my-terraform-state-dev-changeme"
+key    = "proposal7/dev/terraform.tfstate"
+region = "fr-par"
+
+endpoints = {
+  s3 = "https://s3.fr-par.scw.cloud"
+}
+
+skip_credentials_validation = true
+skip_region_validation      = true
+skip_requesting_account_id  = true
+skip_metadata_api_check     = true
+use_path_style              = true
+use_lockfile                = true

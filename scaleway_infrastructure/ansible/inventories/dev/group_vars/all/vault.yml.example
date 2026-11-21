@@ -1,0 +1,9 @@
+---
+# DEV secrets. PLACEHOLDERS ONLY. Never commit real values.
+#   cp vault.yml.example vault.yml
+#   edit the values (long random strings), then encrypt:
+#   ansible-vault encrypt inventories/dev/group_vars/all/vault.yml --vault-password-file .vault_pass.dev
+# Edit later with: ansible-vault edit inventories/dev/group_vars/all/vault.yml
+# Use a different token (and ideally a different vault password) for dev and prod.
+# Generate a token with: openssl rand -hex 32
+vault_k3s_token: "CHANGE_ME_long_random_string_at_least_32_chars"

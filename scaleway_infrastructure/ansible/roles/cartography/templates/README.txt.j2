@@ -1,0 +1,6 @@
+Cartography server layout (managed by Ansible, role cartography).
+  compose/compose.yaml  PLACEHOLDER compose project
+  config/               service configuration
+  data/                 data on the local NVMe disks (not replicated)
+BACKUPS: local NVMe data is not protected by Scaleway. Back it up regularly to the S3 backups bucket
+({{ backups_bucket_name | default('see Terraform output backups_bucket_name') }}), for example with restic or rclone. Not automated here.

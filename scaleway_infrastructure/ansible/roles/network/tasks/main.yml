@@ -1,0 +1,44 @@
+---
+- name: Check inputs
+  ansible.builtin.assert:
+    that:
+      - network_vlan_id | string is match('^[0-9]+$')
+      - network_vlan_id | int > 0
+      - network_vlan_id | int < 4095
+      - network_use_dhcp | bool or network_static_address | length > 0
+    fail_msg: >-
+      The VLAN id is missing. Regenerate the inventory (gen-inventory.sh) after terraform apply,
+      or set network_vlan_id / private_vlan for this host. Without DHCP, set network_static_address.
+    quiet: true
+
+- name: Install the netplan file for the Private Network VLAN
+  ansible.builtin.template:
+    src: netplan-private.yaml.j2
+    dest: "{{ network_netplan_file }}"
+    owner: root
+    group: root
+    mode: "0600"
+  notify: Apply netplan
+
+- name: Generate the netplan configuration (syntax check, nothing is applied)
+  ansible.builtin.command: netplan generate
+  changed_when: false
+
+- name: Apply netplan now
+  ansible.builtin.meta: flush_handlers
+
+- name: Wait for the Private Network address
+  ansible.builtin.command: "ip -4 -o addr show dev {{ network_vlan_interface }}"
+  register: network_addr
+  changed_when: false
+  retries: 10
+  delay: 6
+  until: network_addr.rc == 0 and network_addr.stdout | length > 0
+
+- name: Check that the expected private IP is configured
+  ansible.builtin.assert:
+    that:
+      - network_addr.stdout is search(network_expected_ip ~ '/')
+    fail_msg: "{{ network_vlan_interface }} did not get {{ network_expected_ip }}: {{ network_addr.stdout }}"
+    quiet: true
+  when: network_expected_ip | length > 0

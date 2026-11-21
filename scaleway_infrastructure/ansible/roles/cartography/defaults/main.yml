@@ -1,0 +1,8 @@
+---
+# Baseline for the cartography server. The cartography service itself is NOT defined yet: this role only
+# prepares a directory layout and a PLACEHOLDER compose skeleton.
+cartography_dir: /opt/cartography
+cartography_user: "{{ ansible_user }}"
+# Start the compose project. Off: nothing runs until you replace the placeholder with the real service.
+cartography_compose_up: false
+cartography_compose_profiles: []

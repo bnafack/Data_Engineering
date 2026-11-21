@@ -1,0 +1,9 @@
+---
+- name: Restart k3s
+  ansible.builtin.service:
+    name: k3s
+    state: restarted
+
+- name: Reload ufw
+  community.general.ufw:
+    state: reloaded

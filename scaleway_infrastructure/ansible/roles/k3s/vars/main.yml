@@ -1,0 +1,14 @@
+---
+k3s_tls_san_base: >-
+  {{ ['127.0.0.1', inventory_hostname]
+     + ([k3s_node_ip] if k3s_node_ip | length > 0 else ([private_ip] if private_ip is defined else []))
+     + ([public_ip] if (k3s_tls_san_include_public | bool and public_ip is defined) else [])
+     + k3s_tls_san_extra }}
+k3s_config_base:
+  token: "{{ k3s_token }}"
+  write-kubeconfig-mode: "0600"
+  tls-san: "{{ k3s_tls_san_base | unique }}"
+  secrets-encryption: "{{ k3s_secrets_encryption | bool }}"
+k3s_config_node_ip: "{{ {'node-ip': k3s_node_ip, 'advertise-address': k3s_node_ip} if k3s_node_ip | length > 0 else {} }}"
+k3s_config_disable: "{{ {'disable': k3s_disable} if k3s_disable | length > 0 else {} }}"
+k3s_config: "{{ k3s_config_base | combine(k3s_config_node_ip, k3s_config_disable, k3s_extra_config) }}"

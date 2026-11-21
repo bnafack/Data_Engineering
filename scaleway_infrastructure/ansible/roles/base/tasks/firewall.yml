@@ -1,0 +1,146 @@
+---
+# Lockout safety, in this order:
+#   1. default policies are set while ufw is still inactive
+#   2. SSH allow rules are added BEFORE ufw is enabled
+#   3. a check refuses to enable ufw if no SSH allow rule exists
+#   4. on the first enable, a transient timer disables ufw again unless the connection is confirmed
+- name: Read the current ufw state
+  ansible.builtin.command: ufw status
+  register: base_ufw_status
+  changed_when: false
+  check_mode: false
+
+- name: Remember whether ufw is currently inactive
+  ansible.builtin.set_fact:
+    base_ufw_was_inactive: "{{ 'inactive' in base_ufw_status.stdout | lower }}"
+
+- name: Default deny incoming
+  community.general.ufw:
+    default: deny
+    direction: incoming
+
+- name: Default allow outgoing
+  community.general.ufw:
+    default: allow
+    direction: outgoing
+
+- name: Allow SSH from the admin CIDRs
+  community.general.ufw:
+    rule: allow
+    port: "{{ base_ssh_port | string }}"
+    proto: tcp
+    src: "{{ item }}"
+    comment: "ssh admin"
+  loop: "{{ base_admin_cidrs }}"
+
+- name: Allow SSH from the Private Network (bastion and Public Gateway)
+  community.general.ufw:
+    rule: allow
+    port: "{{ base_ssh_port | string }}"
+    proto: tcp
+    src: "{{ base_private_cidr }}"
+    comment: "ssh private network"
+
+- name: Allow SSH from anywhere (RELAXED first-run mode, remove afterwards)
+  community.general.ufw:
+    rule: allow
+    port: "{{ base_ssh_port | string }}"
+    proto: tcp
+    comment: "ssh relaxed first run"
+  when: base_firewall_relaxed | bool
+
+- name: Remove the relaxed first-run SSH rule (SSH open to anywhere)
+  community.general.ufw:
+    rule: allow
+    port: "{{ base_ssh_port | string }}"
+    proto: tcp
+    delete: true
+  when: not (base_firewall_relaxed | bool)
+- name: Warn about relaxed mode
+  ansible.builtin.debug:
+    msg: "base_firewall_relaxed is true: SSH is open to the whole Internet. Set it back to false and re-run the base playbook."
+  when: base_firewall_relaxed | bool
+
+- name: Allow load balancer ports only from the allowed source CIDRs
+  community.general.ufw:
+    rule: allow
+    port: "{{ item.0 | string }}"
+    proto: tcp
+    src: "{{ item.1 }}"
+    comment: "lb {{ item.0 }}"
+  loop: "{{ base_lb_ports | product(base_lb_source_cidrs) | list }}"
+  loop_control:
+    label: "{{ item.0 }} from {{ item.1 }}"
+
+- name: Allow extra TCP ports from the Private Network only
+  community.general.ufw:
+    rule: allow
+    port: "{{ item | string }}"
+    proto: tcp
+    src: "{{ base_private_cidr }}"
+    comment: "private {{ item }}"
+  loop: "{{ base_private_allowed_tcp_ports }}"
+
+- name: Guard published ports against DNAT bypass (raw table)
+  ansible.builtin.blockinfile:
+    path: /etc/ufw/before.rules
+    marker: "# {mark} ANSIBLE MANAGED public DNAT guard"
+    insertbefore: '^\*filter'
+    block: |
+      *raw
+      :PREROUTING ACCEPT [0:0]
+      {% for cidr in base_lb_source_cidrs %}
+      -A PREROUTING -i {{ base_public_interface }} -s {{ cidr }} -p tcp -m multiport --dports {{ base_lb_ports | join(',') }} -j ACCEPT
+      {% endfor %}
+      -A PREROUTING -i {{ base_public_interface }} -p tcp -m multiport --dports {{ base_lb_ports | join(',') }} -j DROP
+      COMMIT
+    mode: "0640"
+  when:
+    - base_public_dnat_guard | bool
+    - base_public_interface | length > 0
+  notify: Reload ufw
+
+- name: List the rules that ufw will enforce
+  ansible.builtin.command: ufw show added
+  register: base_ufw_added
+  changed_when: false
+  check_mode: false
+
+- name: Refuse to enable ufw without an SSH allow rule
+  ansible.builtin.assert:
+    that:
+      - base_ufw_added.stdout is search('(port |allow )' ~ base_ssh_port ~ '[ /]')
+    fail_msg: "No ufw rule allows SSH on port {{ base_ssh_port }}: not enabling the firewall."
+    quiet: true
+
+- name: Arm the rollback timer (disables ufw if the connection is lost)
+  ansible.builtin.command: >-
+    systemd-run --unit=ufw-rollback-{{ ansible_facts['date_time']['epoch'] }}
+    --on-active={{ base_firewall_rollback_seconds }}s /usr/sbin/ufw disable
+  register: base_rollback_timer
+  changed_when: true
+  when:
+    - base_firewall_enable | bool
+    - base_ufw_was_inactive | bool
+    - base_firewall_rollback_seconds | int > 0
+
+- name: Enable ufw
+  community.general.ufw:
+    state: enabled
+    logging: low
+  when: base_firewall_enable | bool
+
+- name: Confirm the SSH connection still works after enabling ufw
+  when: base_rollback_timer is not skipped
+  block:
+    - name: Drop the current SSH connection
+      ansible.builtin.meta: reset_connection
+
+    - name: Wait for a new SSH connection
+      ansible.builtin.wait_for_connection:
+        timeout: "{{ [base_firewall_rollback_seconds | int - 30, 30] | max }}"
+
+    - name: Cancel the rollback timer
+      ansible.builtin.systemd_service:
+        name: "ufw-rollback-{{ ansible_facts['date_time']['epoch'] }}.timer"
+        state: stopped

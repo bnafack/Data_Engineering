@@ -1,0 +1,79 @@
+---
+- name: Skip Argo CD when it is disabled
+  ansible.builtin.meta: end_host
+  when: not (argocd_enabled | bool)
+
+- name: Check inputs
+  ansible.builtin.assert:
+    that:
+      - inventory_hostname in groups['app']
+      - argocd_version is match('^v[0-9]+\.[0-9]+\.[0-9]+$')
+      - argocd_root_app_repo_url | length == 0 or argocd_root_app_path | length > 0
+    fail_msg: "Argo CD runs on the app group, with an exact version; a root app needs argocd_root_app_path."
+    quiet: true
+
+- name: Create the state directory
+  ansible.builtin.file:
+    path: "{{ argocd_state_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Create the namespace
+  ansible.builtin.command:
+    cmd: k3s kubectl apply -f -
+    stdin: |
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: {{ argocd_namespace }}
+  register: argocd_ns
+  changed_when: "'created' in argocd_ns.stdout"
+
+- name: Download the pinned Argo CD manifest
+  ansible.builtin.get_url:
+    url: "{{ argocd_manifest_url }}"
+    dest: "{{ argocd_state_dir }}/install-{{ argocd_version }}.yaml"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Apply the Argo CD manifest (server-side, once per version)
+  ansible.builtin.command:
+    cmd: >-
+      k3s kubectl apply -n {{ argocd_namespace }} --server-side --force-conflicts
+      -f {{ argocd_state_dir }}/install-{{ argocd_version }}.yaml
+    creates: "{{ argocd_state_dir }}/applied-{{ argocd_version }}"
+  register: argocd_apply
+
+- name: Record the applied version
+  ansible.builtin.copy:
+    content: "{{ argocd_version }}\n"
+    dest: "{{ argocd_state_dir }}/applied-{{ argocd_version }}"
+    force: false
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Wait for the Argo CD server
+  ansible.builtin.command: "k3s kubectl -n {{ argocd_namespace }} rollout status deploy/argocd-server --timeout=300s"
+  changed_when: false
+
+- name: Create the root Application
+  ansible.builtin.command:
+    cmd: k3s kubectl apply -f -
+    stdin: "{{ lookup('ansible.builtin.template', 'root-app.yaml.j2') }}"
+  register: argocd_root
+  changed_when: "'created' in argocd_root.stdout or 'configured' in argocd_root.stdout"
+  when: argocd_root_app_repo_url | length > 0
+
+- name: How to reach Argo CD (not exposed publicly)
+  ansible.builtin.debug:
+    msg:
+      - >-
+        Initial admin password (on the app server): k3s kubectl -n {{ argocd_namespace }}
+        get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d
+      - "UI, step 1 (app server): k3s kubectl -n {{ argocd_namespace }} port-forward svc/argocd-server 8080:443"
+      - "UI, step 2 (your machine): ssh -N -L 8080:127.0.0.1:8080 {{ ansible_ssh_common_args | default('') }} {{ ansible_user }}@{{ ansible_host }}"
+      - "Then open https://127.0.0.1:8080 (user admin). Change the password and delete the initial secret."

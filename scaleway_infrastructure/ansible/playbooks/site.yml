@@ -1,0 +1,19 @@
+---
+# Everything, in order. Tags: base, ssh, firewall, packages, network, docker, k3s, kubeconfig, argocd, cartography.
+- name: Base
+  ansible.builtin.import_playbook: base.yml
+
+- name: Network
+  ansible.builtin.import_playbook: network.yml
+
+- name: Docker
+  ansible.builtin.import_playbook: docker.yml
+
+- name: K3s
+  ansible.builtin.import_playbook: k3s.yml
+
+- name: Argo CD
+  ansible.builtin.import_playbook: argocd.yml
+
+- name: Cartography
+  ansible.builtin.import_playbook: cartography.yml
