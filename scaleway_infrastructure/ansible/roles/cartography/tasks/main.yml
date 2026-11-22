@@ -1,0 +1,43 @@
+---
+- name: Check inputs
+  ansible.builtin.assert:
+    that: inventory_hostname in groups['cartography']
+    fail_msg: "The cartography role runs on the cartography group only."
+    quiet: true
+
+- name: Create the directory layout
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ cartography_user }}"
+    group: "{{ cartography_user }}"
+    mode: "0750"
+  loop:
+    - "{{ cartography_dir }}"
+    - "{{ cartography_dir }}/compose"
+    - "{{ cartography_dir }}/config"
+    - "{{ cartography_dir }}/data"
+
+- name: Install the placeholder compose file
+  ansible.builtin.template:
+    src: compose.yaml.j2
+    dest: "{{ cartography_dir }}/compose/compose.yaml"
+    owner: "{{ cartography_user }}"
+    group: "{{ cartography_user }}"
+    mode: "0640"
+    force: false
+
+- name: Install the layout notes
+  ansible.builtin.template:
+    src: README.txt.j2
+    dest: "{{ cartography_dir }}/README.txt"
+    owner: "{{ cartography_user }}"
+    group: "{{ cartography_user }}"
+    mode: "0644"
+
+- name: Start the compose project
+  community.docker.docker_compose_v2:
+    project_src: "{{ cartography_dir }}/compose"
+    profiles: "{{ cartography_compose_profiles }}"
+    state: present
+  when: cartography_compose_up | bool

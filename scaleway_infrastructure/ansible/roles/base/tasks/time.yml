@@ -1,0 +1,10 @@
+---
+- name: Set timezone
+  community.general.timezone:
+    name: "{{ base_timezone }}"
+
+- name: Enable and start chrony
+  ansible.builtin.service:
+    name: chrony
+    state: started
+    enabled: true

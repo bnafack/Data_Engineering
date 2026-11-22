@@ -1,0 +1,108 @@
+# DEV environment. Copy to envs/dev.tfvars (git-ignored) and edit:
+#   cp envs/dev.tfvars.example envs/dev.tfvars
+# Never put API keys here: use SCW_ACCESS_KEY / SCW_SECRET_KEY environment variables.
+# Use a SEPARATE Scaleway project for dev: the project_id below must differ from prod.
+
+# ---------------------------------------------------------------------------
+# General
+# ---------------------------------------------------------------------------
+# REQUIRED: the DEV Scaleway project ID (Console > Project settings).
+project_id = "00000000-0000-0000-0000-000000000000"
+# Dev runs in Amsterdam (AMS 1). Prod stays in Paris (fr-par-1).
+# EM-B420E-NVMe is not in the AMS catalog, hence the EM-B212X-SSD cartography server below.
+region      = "nl-ams"
+zone        = "nl-ams-1"
+name_prefix = "dev"
+tags        = ["dev", "terraform"]
+
+# ---------------------------------------------------------------------------
+# Network (use a different range from prod)
+# ---------------------------------------------------------------------------
+private_network_cidr  = "172.16.64.0/22"
+gateway_type          = "VPC-GW-S"
+bastion_port          = 61000
+bastion_allowed_cidrs = ["203.0.113.10/32"] # REQUIRED: team IPs, never empty
+
+# ---------------------------------------------------------------------------
+# SSH
+# ---------------------------------------------------------------------------
+ssh_public_keys = {
+  "alice-laptop" = "ssh-ed25519 AAAA... alice@host"
+}
+server_ssh_user = "ubuntu"
+
+# ---------------------------------------------------------------------------
+# Load balancer
+# ---------------------------------------------------------------------------
+lb_type        = "LB-S"
+app_http_port  = 80
+app_https_port = 443
+
+# Optional Let's Encrypt certificate on the load balancer (TLS terminated on the LB).
+# [] = no certificate, TCP pass-through (TLS on the app server).
+# The names must already point to lb_public_ip (A record at LWS) before apply.
+lb_domain_names           = []   # e.g. ["app.example.com", "www.example.com"]
+lb_health_check_http_path = null # e.g. "/healthz" (null = TCP health check)
+
+# ---------------------------------------------------------------------------
+# Bare metal servers (billed as soon as created)
+# Dev: off by default. Turn on only when you need to test on the real servers.
+# The load balancer backends are only created when the app server exists.
+# ---------------------------------------------------------------------------
+create_app_server         = false
+create_cartography_server = false
+
+app_offer_name         = "EM-L105X-SATA"
+cartography_offer_name = "EM-B212X-SSD" # cheaper alternative for dev
+
+app_private_network_option_name         = "Private Networks 1 Gbps feature"
+cartography_private_network_option_name = "Private Networks 1 Gbps feature"
+
+# Recommended: the exact option IDs of your offers (they override the names).
+# Find them with: ./find-pn-options.sh nl-ams-1 <offer-name> hourly
+app_private_network_option_id         = null
+cartography_private_network_option_id = null
+
+os_name                   = "Ubuntu"
+os_version                = "26.04 LTS (Resolute Raccoon)"
+offer_subscription_period = "hourly"
+
+app_cloud_init         = null
+cartography_cloud_init = null
+server_protected       = false
+
+# ---------------------------------------------------------------------------
+# Managed PostgreSQL (small, no HA)
+# Note: prevent_destroy in database.tf also applies in dev.
+# ---------------------------------------------------------------------------
+db_engine                 = "PostgreSQL-16"
+db_node_type              = "db-play2-pico"
+db_volume_type            = "sbs_5k"
+db_volume_size_gb         = 20
+db_is_ha                  = false
+db_backup_retention_days  = 7
+db_backup_frequency_hours = 24
+db_encryption_at_rest     = true
+db_admin_user             = "rdb_admin"
+db_name                   = "app"
+db_app_user               = "app_user"
+
+# ---------------------------------------------------------------------------
+# Storage and registry
+# ---------------------------------------------------------------------------
+# REQUIRED: globally unique, different from prod.
+bucket_suffix           = "changeme-dev-abc123"
+documents_bucket_name   = null
+backups_bucket_name     = null
+registry_namespace_name = null
+
+# Dev only: allow destroying non-empty buckets.
+buckets_force_destroy = true
+
+# ---------------------------------------------------------------------------
+# Secret Manager (database passwords, application API key)
+# ---------------------------------------------------------------------------
+secrets_enabled          = true
+secrets_path             = null  # null = "/<name_prefix>", e.g. /dev
+secrets_protected        = false # true = cannot be deleted until protection is removed
+secrets_grant_app_access = true  # the application identity can read the project's secrets

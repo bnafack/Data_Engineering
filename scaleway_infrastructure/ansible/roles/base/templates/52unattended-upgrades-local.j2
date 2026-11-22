@@ -1,0 +1,3 @@
+// Managed by Ansible (role base).
+Unattended-Upgrade::Automatic-Reboot "{{ 'true' if base_unattended_auto_reboot | bool else 'false' }}";
+Unattended-Upgrade::Remove-Unused-Dependencies "true";

@@ -1,0 +1,4 @@
+---
+# Environment-independent defaults only. NEVER put dev/prod values here:
+# they belong in inventories/<env>/group_vars/all/.
+ansible_python_interpreter: auto_silent

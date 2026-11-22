@@ -1,0 +1,8 @@
+---
+profile: production
+exclude_paths:
+  - .ansible/
+  - fetched/
+  - inventories/*/hosts.yml
+  - cloud-init/
+offline: true

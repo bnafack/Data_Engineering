@@ -1,0 +1,66 @@
+---
+# SECURITY: ports published with "-p 8080:80" are NATed before ufw INPUT rules, so ufw alone does not
+# protect them. Bind to 127.0.0.1 or the private IP ("-p 172.16.64.3:8080:80"). The base role also drops
+# public traffic to the load balancer ports (80/443) in the raw table.
+- name: Remove conflicting packages
+  ansible.builtin.apt:
+    name: "{{ docker_conflicting_packages }}"
+    state: absent
+  when: docker_remove_conflicting | bool
+
+- name: Create the apt keyrings directory
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Download the Docker apt signing key
+  ansible.builtin.get_url:
+    url: "{{ docker_apt_key_url }}"
+    dest: /etc/apt/keyrings/docker.asc
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Add the Docker apt repository
+  ansible.builtin.deb822_repository:
+    name: docker
+    types: [deb]
+    uris: "{{ docker_apt_uri }}"
+    suites: ["{{ docker_apt_suite }}"]
+    components: [stable]
+    architectures: ["{{ docker_apt_arch }}"]
+    signed_by: /etc/apt/keyrings/docker.asc
+    state: present
+  register: docker_repo
+
+- name: Install Docker Engine
+  ansible.builtin.apt:
+    name: "{{ docker_packages }}"
+    state: present
+    update_cache: "{{ docker_repo is changed }}"
+  notify: Restart docker
+
+- name: Configure the Docker daemon
+  ansible.builtin.template:
+    src: daemon.json.j2
+    dest: /etc/docker/daemon.json
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart docker
+
+- name: Add users to the docker group
+  ansible.builtin.user:
+    name: "{{ item }}"
+    groups: docker
+    append: true
+  loop: "{{ docker_users }}"
+
+- name: Enable and start Docker
+  ansible.builtin.service:
+    name: docker
+    state: started
+    enabled: true

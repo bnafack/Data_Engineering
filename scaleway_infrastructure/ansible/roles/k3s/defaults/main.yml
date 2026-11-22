@@ -1,0 +1,39 @@
+---
+# Exact k3s release. "latest" and channels are refused. To upgrade: change this value and re-run `./run.sh <env> k3s`.
+# Check releases: https://github.com/k3s-io/k3s/releases (this value was the latest release when written; confirm the
+# stable channel with `curl -s https://update.k3s.io/v1-release/channels` before prod).
+k3s_version: "v1.37.2+k3s1"
+
+# Install script of the SAME tag (not the unversioned get.k3s.io). Optional sha256 pin: "sha256:<hex>".
+# RECOMMENDED for prod: set it (curl -sL <url> | sha256sum) so the script cannot change unnoticed.
+k3s_install_script_url: "https://raw.githubusercontent.com/k3s-io/k3s/{{ k3s_version | replace('+', '%2B') }}/install.sh"
+k3s_install_script_checksum: ""
+
+# Cluster token, from the Ansible Vault (inventories/<env>/group_vars/all/vault.yml). Min 32 characters.
+k3s_token: "{{ vault_k3s_token }}"
+
+# Private IP used as node-ip / advertise-address (only when the Private Network is configured on the server).
+k3s_node_ip: "{{ private_ip | default('') if (network_configure | default(false) | bool) else '' }}"
+# Extra names/IPs in the API certificate. 127.0.0.1 is always present (SSH tunnel on 6443).
+k3s_tls_san_extra: []
+k3s_tls_san_include_public: false
+
+# Bundled components to disable, for example ["traefik"] if you bring your own ingress, or ["servicelb"].
+# Default keeps Traefik (ingress on 80/443, reached through the load balancer).
+k3s_disable: []
+k3s_secrets_encryption: true
+# Extra raw config.yaml keys, merged last.
+k3s_extra_config: {}
+
+# Host firewall rules for k3s (official ufw guidance: allow the pod and service CIDRs).
+# 6443 is NEVER opened: use `ssh -L 6443:127.0.0.1:6443`.
+k3s_manage_ufw: true
+k3s_pod_cidr: 10.42.0.0/16
+k3s_service_cidr: 10.43.0.0/16
+
+# kubeconfig for the admin user (~/.kube/config) and optional copy to the controller (git-ignored).
+k3s_kubeconfig_user: "{{ ansible_user }}"
+k3s_fetch_kubeconfig: true
+k3s_fetch_dest: "{{ playbook_dir }}/../fetched/{{ env_name }}"
+
+k3s_ready_timeout: 180s

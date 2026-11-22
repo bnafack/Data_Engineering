@@ -1,0 +1,42 @@
+# Terraform local state and working files
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+tfplan
+
+# Variable files may contain sensitive values (the *.example files are tracked)
+*.tfvars
+*.tfvars.json
+!terraform.tfvars.example
+
+# Per-environment backend settings (the *.example files are tracked)
+terraform/envs/*.backend.hcl
+
+# Saved plans and local per-environment state
+tfplan*
+terraform/states/
+
+# Local overrides and CLI config
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+
+# NOTE: .terraform.lock.hcl is intentionally NOT ignored (commit it).
+
+# Ansible: real inventories, variables and secrets (the *.example files stay tracked)
+ansible/inventories/*/hosts.yml
+ansible/inventories/*/group_vars/all/main.yml
+ansible/inventories/*/group_vars/all/terraform.yml
+ansible/inventories/*/group_vars/all/vault.yml
+ansible/inventories/*/host_vars/
+ansible/.vault_pass
+ansible/.vault_pass.*
+ansible/fetched/
+ansible/.ansible/
+*.retry
+*.kubeconfig

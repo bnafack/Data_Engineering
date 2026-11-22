@@ -1,0 +1,19 @@
+---
+# Imported by every playbook: refuses to run when the inventory and the variables do not belong
+# to the same environment, so dev and prod are never mixed.
+- name: Check the environment
+  hosts: all
+  gather_facts: false
+  tags: [always]
+  tasks:
+    - name: Inventory directory must match env_name
+      ansible.builtin.assert:
+        that:
+          - env_name is defined
+          - env_name in ['dev', 'prod']
+          - inventory_dir | basename == env_name
+          - inventory_hostname is match('^' ~ env_name ~ '-')
+        fail_msg: >-
+          env_name={{ env_name | default('undefined') }} does not match the inventory
+          ({{ inventory_dir }}, host {{ inventory_hostname }}). Use ./run.sh <env> <playbook>.
+        quiet: true

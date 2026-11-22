@@ -1,0 +1,29 @@
+---
+- name: Read authorized_keys of the admin user
+  ansible.builtin.stat:
+    path: "/home/{{ base_admin_user }}/.ssh/authorized_keys"
+  register: base_authorized_keys
+
+- name: Refuse key-only SSH when the admin user has no authorized key
+  ansible.builtin.assert:
+    that:
+      - base_authorized_keys.stat.exists
+      - base_authorized_keys.stat.size > 0
+    fail_msg: "/home/{{ base_admin_user }}/.ssh/authorized_keys is missing or empty: password login is still needed, refusing to disable it."
+    quiet: true
+
+- name: Install SSH hardening drop-in
+  ansible.builtin.template:
+    src: sshd-hardening.conf.j2
+    dest: /etc/ssh/sshd_config.d/10-hardening.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Reload ssh
+
+- name: Validate the sshd configuration
+  ansible.builtin.command: sshd -t
+  changed_when: false
+
+- name: Apply SSH changes now (a broken config was rejected above)
+  ansible.builtin.meta: flush_handlers

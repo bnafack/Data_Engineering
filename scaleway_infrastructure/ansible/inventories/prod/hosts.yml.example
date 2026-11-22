@@ -1,0 +1,31 @@
+---
+# PROD inventory. Do not edit by hand: generate it from Terraform outputs.
+#   ./gen-inventory.sh prod --mode public    # first run, SSH over the public IPs (admin CIDRs only)
+#   ./gen-inventory.sh prod --mode bastion --force   # afterwards, via the SSH bastion
+# This example shows the BASTION mode; the PUBLIC mode is in the comments.
+# Values below are placeholders (documentation addresses).
+all:
+  vars:
+    ansible_user: ubuntu
+    connection_mode: bastion   # bastion | public (informational, written by gen-inventory.sh)
+  children:
+    servers:
+      children:
+        app:
+          hosts:
+            prod-app:
+              ansible_host: 172.16.68.2          # app_server_private_ip
+              private_ip: 172.16.68.2            # app_server_private_ip
+              public_ip: 203.0.113.20            # app_server_public_ipv4
+              private_vlan: 1234                 # app_server_private_vlan
+              # bastion mode: jump through the Public Gateway
+              ansible_ssh_common_args: "-o ProxyJump=bastion@198.51.100.10:61000"
+              # public mode instead: ansible_host: 203.0.113.20 and no ansible_ssh_common_args
+        cartography:
+          hosts:
+            prod-cartography:
+              ansible_host: 172.16.68.3          # cartography_server_private_ip
+              private_ip: 172.16.68.3
+              public_ip: 203.0.113.21            # cartography_server_public_ipv4
+              private_vlan: 1235                 # cartography_server_private_vlan
+              ansible_ssh_common_args: "-o ProxyJump=bastion@198.51.100.10:61000"

@@ -1,0 +1,10 @@
+# Managed by Ansible (role base).
+# The Private Network is ignored so the bastion (Public Gateway) is never banned.
+[sshd]
+enabled = true
+backend = systemd
+port = {{ base_ssh_port }}
+maxretry = {{ base_fail2ban_maxretry }}
+findtime = {{ base_fail2ban_findtime }}
+bantime = {{ base_fail2ban_bantime }}
+ignoreip = 127.0.0.1/8 ::1 {{ base_private_cidr }}

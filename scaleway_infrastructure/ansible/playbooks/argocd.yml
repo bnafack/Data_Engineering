@@ -1,0 +1,13 @@
+---
+- name: Import the environment guard
+  ansible.builtin.import_playbook: guard.yml
+
+- name: Argo CD on the app server (optional, argocd_enabled)
+  hosts: app
+  become: true
+  gather_facts: false
+  any_errors_fatal: true
+  max_fail_percentage: 0
+  roles:
+    - role: argocd
+      tags: [argocd]
