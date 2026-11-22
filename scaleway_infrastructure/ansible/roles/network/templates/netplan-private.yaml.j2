@@ -1,11 +1,11 @@
-# Managed by Ansible (role network). UNVERIFIED on Elastic Metal.
-# Only the Private Network VLAN is declared here. The public NIC configuration (installer file) is untouched.
+# Managed by Ansible (role network). Do not edit by hand: changes are overwritten.
+# Private Network VLAN only. The public NIC (50-cloud-init.yaml) is untouched.
 network:
   version: 2
   vlans:
     {{ network_vlan_interface }}:
       id: {{ network_vlan_id | int }}
-      link: {{ network_parent_interface_effective }}
+      link: {{ network_parent_netplan_id }}
 {% if network_use_dhcp | bool %}
       dhcp4: true
       dhcp4-overrides:

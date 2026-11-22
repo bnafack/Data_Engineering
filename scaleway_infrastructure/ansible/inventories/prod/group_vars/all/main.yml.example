@@ -15,8 +15,12 @@ admin_cidrs:
 # Leave false unless your admin IP is not in admin_cidrs yet. Set back to false and re-run.
 base_firewall_relaxed: false
 
-# Private Network VLAN interface (netplan). Opt-in until verified on a real server.
-network_configure: false
+# Private Network VLAN interface (netplan, file /etc/netplan/60-private-network.yaml, VLAN "vlan<id>").
+# Verified on Elastic Metal Ubuntu (dev). Replaces a hand-made file at the same path.
+network_configure: true
+# Netplan ID of the parent NIC (key under `ethernets:` in /etc/netplan/50-cloud-init.yaml, e.g. eth0),
+# NOT the kernel name (eno1). Empty = auto-detect by MAC.
+network_parent_interface: ""
 
 docker_enabled: true
 

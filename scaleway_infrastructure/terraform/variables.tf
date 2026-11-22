@@ -2,7 +2,7 @@
 # General
 # ---------------------------------------------------------------------------
 variable "project_id" {
-  description = "Scaleway project ID. Leave null to use SCW_DEFAULT_PROJECT_ID."
+  description = "Scaleway project ID of this environment. Set it in envs/<env>.tfvars (takes the place of SCW_DEFAULT_PROJECT_ID, which must not be exported)."
   type        = string
   default     = null
 }
@@ -14,9 +14,14 @@ variable "region" {
 }
 
 variable "zone" {
-  description = "Scaleway availability zone (Paris 1)."
+  description = "Scaleway availability zone (fr-par-1 = Paris 1, nl-ams-1 = Amsterdam 1). Must belong to var.region."
   type        = string
   default     = "fr-par-1"
+
+  validation {
+    condition     = startswith(var.zone, "${var.region}-")
+    error_message = "zone must belong to region (for example region nl-ams with zone nl-ams-1)."
+  }
 }
 
 variable "name_prefix" {
@@ -114,6 +119,70 @@ variable "lb_type" {
   default     = "LB-S"
 }
 
+variable "secrets_enabled" {
+  description = "Store the generated secrets (database passwords, application API key) in Scaleway Secret Manager."
+  type        = bool
+  default     = true
+}
+
+variable "secrets_path" {
+  description = "Secret Manager folder for this environment. Null = \"/<name_prefix>\" (e.g. /dev)."
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.secrets_path == null || can(regex("^/([A-Za-z0-9._-]+(/[A-Za-z0-9._-]+)*)?$", coalesce(var.secrets_path, "/")))
+    error_message = "secrets_path must start with \"/\", e.g. \"/dev\" or \"/proposal7/dev\"."
+  }
+}
+
+variable "secrets_protected" {
+  description = "Protect the secrets against deletion (a protected secret cannot be deleted until protection is removed). Recommended for prod."
+  type        = bool
+  default     = false
+}
+
+variable "secrets_grant_app_access" {
+  description = "Allow the application identity (IAM application) to read the secrets of the project."
+  type        = bool
+  default     = true
+}
+
+variable "lb_domain_names" {
+  description = <<-EOT
+    Domain names for a Let's Encrypt certificate on the load balancer. Empty = no certificate, TCP pass-through
+    (TLS on the app server). Not empty = TLS terminated on the load balancer: the first name is the common name,
+    the others are alternative names. Every name must already resolve to lb_public_ip (A record at your DNS
+    provider) before terraform apply, otherwise Let's Encrypt cannot validate it.
+  EOT
+  type        = list(string)
+  default     = []
+
+  validation {
+    condition = alltrue([
+      for d in var.lb_domain_names :
+      can(regex("^([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,63}$", d))
+    ])
+    error_message = "lb_domain_names must be lowercase fully qualified domain names, e.g. app.example.com (no wildcard, no scheme)."
+  }
+
+  validation {
+    condition     = length(var.lb_domain_names) == length(distinct(var.lb_domain_names))
+    error_message = "lb_domain_names must not contain duplicates."
+  }
+}
+
+variable "lb_health_check_http_path" {
+  description = "With a certificate (HTTP mode): path of an HTTP health check that returns 200, e.g. \"/healthz\". Null = TCP check."
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.lb_health_check_http_path == null || startswith(coalesce(var.lb_health_check_http_path, "/"), "/")
+    error_message = "lb_health_check_http_path must start with \"/\"."
+  }
+}
+
 variable "app_http_port" {
   description = "Backend port on the app server for HTTP traffic."
   type        = number
@@ -163,6 +232,33 @@ variable "cartography_private_network_option_name" {
   description = "Private Network option name for the cartography server. Use \"Private Networks 1 Gbps feature\" with EM-B212X-SSD."
   type        = string
   default     = "Private Networks 10 Gbps feature"
+}
+
+# Recommended: set the option ID instead of the name. Options are looked up by
+# name across the whole zone, and several options can share a name; the
+# provider then rejects one that is not in the offer's own option list
+# ("attaching a private network requires enabling an offer-compatible private
+# network option"). Find the right ID with: ./find-pn-options.sh <zone> <offer>
+variable "app_private_network_option_id" {
+  description = "Private Network option ID of the app server offer (from find-pn-options.sh). Overrides app_private_network_option_name when set."
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.app_private_network_option_id == null || can(regex("^([a-z]{2}-[a-z]{3}-[0-9]/)?[0-9a-f-]{36}$", var.app_private_network_option_id))
+    error_message = "app_private_network_option_id must be a UUID (optionally prefixed with the zone, e.g. nl-ams-1/<uuid>)."
+  }
+}
+
+variable "cartography_private_network_option_id" {
+  description = "Private Network option ID of the cartography server offer (from find-pn-options.sh). Overrides cartography_private_network_option_name when set."
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.cartography_private_network_option_id == null || can(regex("^([a-z]{2}-[a-z]{3}-[0-9]/)?[0-9a-f-]{36}$", var.cartography_private_network_option_id))
+    error_message = "cartography_private_network_option_id must be a UUID (optionally prefixed with the zone, e.g. nl-ams-1/<uuid>)."
+  }
 }
 
 variable "os_name" {

@@ -1,26 +1,39 @@
 ---
-# UNVERIFIED: the netplan layout below follows the documented model (a Private Network is a VLAN on the
-# server NIC, address from IPAM/DHCP). The Scaleway page could not be checked while writing this role.
-# Opt-in: nothing happens until network_configure is true (set it in inventories/<env>/group_vars/all/main.yml).
+# Private Network VLAN interface on Scaleway Elastic Metal (Ubuntu).
+# VERIFIED on the dev app server (EM offer, Ubuntu image):
+#   - the Private Network is a VLAN on the public NIC, the address comes from IPAM over DHCP;
+#   - /etc/netplan/50-cloud-init.yaml declares the NIC under the netplan ID "eth0", matched by MAC,
+#     while the kernel name is "eno1". The VLAN `link:` must use the netplan ID, not the kernel name
+#     (otherwise: "interface 'eno1' is not defined").
+# Other OS images may name things differently: check `cat /etc/netplan/*.yaml` if detection fails.
+# Opt-in: nothing happens until network_configure is true (inventories/<env>/group_vars/all/main.yml).
 network_configure: false
 
-# Parent NIC of the VLAN. Empty = interface of the default (public) route. CHECK with `ip -br link`.
+# Netplan ID of the VLAN parent (the key under `ethernets:` in /etc/netplan, e.g. "eth0").
+# NOT the kernel name (eno1). Empty = auto-detect: the netplan ethernet whose match.macaddress
+# equals the MAC of the default-route interface (or whose key / set-name equals its kernel name).
 network_parent_interface: ""
+
 # VLAN ID of this server in the Private Network (Terraform outputs *_server_private_vlan, host var private_vlan).
 network_vlan_id: "{{ private_vlan | default('') }}"
-network_vlan_interface: "{{ network_parent_interface_effective }}.{{ network_vlan_id }}"
-network_parent_interface_effective: "{{ network_parent_interface | default('', true) or ansible_facts['default_ipv4']['interface'] }}"
+# Name of the VLAN interface. Neutral name, independent of the parent's name.
+network_vlan_interface: "vlan{{ network_vlan_id }}"
 
 # IPv4 the server is expected to get (Terraform output *_server_private_ip, host var private_ip).
 network_expected_ip: "{{ private_ip | default('') }}"
-# DHCP (IPAM) is the default. Static fallback: "<ip>/<prefix>", for example "172.16.64.2/22".
+# DHCP (IPAM) is the default and works. Static fallback: "<ip>/<prefix>", for example "172.16.64.5/22".
 network_use_dhcp: true
 network_static_address: ""
 
-# The Private Network pushes a default route when the Public Gateway has push_default_route enabled.
-# We keep the PUBLIC default route (apt, Docker, k3s downloads need no NAT) and ignore routes/DNS from DHCP.
+# Keep the PUBLIC default route (apt, Docker, k3s downloads need no NAT) and ignore routes/DNS from DHCP.
 network_dhcp_use_routes: false
 network_dhcp_use_dns: false
 network_mtu: ""
 
-network_netplan_file: /etc/netplan/60-private-network.yaml
+# Same path as the manual setup: the role replaces a hand-made file instead of adding a second VLAN.
+network_netplan_dir: /etc/netplan
+network_netplan_file: "{{ network_netplan_dir }}/60-private-network.yaml"
+
+# Seconds to wait for the private address after netplan apply.
+network_wait_retries: 10
+network_wait_delay: 6

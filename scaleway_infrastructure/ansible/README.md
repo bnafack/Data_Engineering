@@ -3,7 +3,7 @@
 Terraform creates the two Elastic Metal servers (`<env>-app`, `<env>-cartography`). This project configures them afterwards:
 
 - baseline: packages, time, unattended upgrades, SSH hardening, fail2ban, host firewall
-- optional Private Network VLAN interface (netplan), UNVERIFIED
+- Private Network VLAN interface (netplan), verified on Elastic Metal Ubuntu
 - Docker Engine (official apt repository, pinned)
 - k3s, single server, pinned version, on the app server only
 - Argo CD (optional, off by default)
@@ -58,7 +58,7 @@ cloud-init/minimal.yaml  fetched/ (kubeconfigs, git-ignored)
 2. Inventory over public IPs for the first run: `./gen-inventory.sh <env> --mode public`. Then `cp inventories/<env>/group_vars/all/main.yml.example inventories/<env>/group_vars/all/main.yml` and set `admin_cidrs` (your IPs, like Terraform `bastion_allowed_cidrs`).
 3. Secrets: copy `vault.yml.example` to `vault.yml`, set a real token (`openssl rand -hex 32`), then encrypt (see Vault).
 4. First run over the public IP: `./run.sh <env> base`. The firewall allows SSH only from `admin_cidrs` and the Private Network. If your IP is not covered yet, set `base_firewall_relaxed: true` for this run only, then set it back to `false` and re-run.
-5. Optional Private Network interface: set `network_configure: true`, run `./run.sh <env> network` (UNVERIFIED, see below).
+5. Private Network interface: with `network_configure: true` (the example default), run `./run.sh <env> network` (see "Private Network interface" below).
 6. Switch to the bastion: `./gen-inventory.sh <env> --mode bastion --force` (ProxyJump `bastion@<gateway_ip>:61000`, targets are the private IPs). This needs the private interface to work.
 7. Everything: `./run.sh <env> site`.
 
@@ -111,9 +111,58 @@ KUBECONFIG=fetched/dev/dev-app.kubeconfig kubectl get nodes
 
 Set `argocd_enabled: true` (and optionally `argocd_root_app_repo_url` plus `argocd_root_app_path` for a root Application), then `./run.sh <env> argocd`. The pinned manifest is applied server-side. The run prints how to read the initial admin password and how to reach the UI with `kubectl port-forward` plus `ssh -L 8080:127.0.0.1:8080`. No Ingress is created. Credentials for private Git repos are out of scope.
 
-## Private Network interface (role network, UNVERIFIED)
+## Private Network interface (role network)
 
-Off by default (`network_configure: false`). Each server has one NIC; the Private Network is a VLAN on it. The role writes `/etc/netplan/60-private-network.yaml` with `<parent>.<vlan>`, DHCP (IPAM), `use-routes: false` and `use-dns: false`, so the public default route stays (apt, Docker and k3s downloads need no NAT). Only the VLAN is declared; the installer's public NIC file is untouched. Alternative (not implemented): drop the public default route and use the gateway masquerade, which makes the gateway a single point of failure for updates. The Scaleway documentation page could not be consulted while writing this, so the netplan details, the NIC name and the VLAN id source are unconfirmed. Check with `ip -br link` and the Scaleway console first; set `network_parent_interface` if detection is wrong.
+Verified by hand on the dev app server, then automated. The Private Network is a VLAN on the server's public NIC, and the address comes from IPAM over DHCP.
+
+What the server looks like (Elastic Metal, Ubuntu):
+- Kernel name of the NIC: `eno1` (`ip -br link`), which also carries the public IP and the default route.
+- `/etc/netplan/50-cloud-init.yaml` declares that NIC under the netplan ID `eth0`, matched by MAC:
+  ```yaml
+  network:
+    version: 2
+    ethernets:
+      eth0:
+        match:
+          macaddress: "44:A8:42:29:9F:D2"
+        dhcp4: true
+  ```
+- A VLAN with `link: eno1` is rejected: `Error in network definition: eno1.2116: interface 'eno1' is not defined`. The `link:` must use the netplan ID.
+
+What the role writes (`/etc/netplan/60-private-network.yaml`, mode 0600), here for VLAN 2116:
+```yaml
+network:
+  version: 2
+  vlans:
+    vlan2116:
+      id: 2116
+      link: eth0
+      dhcp4: true
+      dhcp4-overrides:
+        use-routes: false
+        use-dns: false
+```
+
+How it works:
+1. The VLAN id comes from the inventory (`private_vlan`, from the Terraform output `*_server_private_vlan`).
+2. The parent is detected: the role reads `/etc/netplan/*.yaml` and picks the `ethernets` entry whose `match.macaddress` equals the MAC of the default-route interface (case-insensitive), or whose key or `set-name` equals its kernel name. It fails with a clear message if it finds none or more than one. To force it, set `network_parent_interface: eth0` (the netplan ID, not `eno1`).
+3. The file is written with a backup and checked with `netplan generate`. If netplan rejects it, the previous file is restored and nothing is applied.
+4. `netplan apply` runs only when the file changed.
+5. The role checks that the VLAN got the expected private IP (`private_ip`) and that the default route is still on the public NIC.
+
+`use-routes: false` and `use-dns: false` keep the public default route and DNS, so apt, Docker and k3s downloads go out directly. If DHCP ever doesn't answer, set `network_use_dhcp: false` and `network_static_address: "<private_ip>/<prefix>"`.
+
+Run it:
+```bash
+./gen-inventory.sh dev --mode public          # first access, over the public IP
+./run.sh dev network --check --diff
+./run.sh dev network
+./gen-inventory.sh dev --mode bastion --force # from now on, through the bastion
+```
+
+Migration from the manual setup: the role writes the same path, so it replaces a hand-made `60-private-network.yaml`. If your manual file used another path or another VLAN name for the same VLAN, delete it first, or two interfaces will claim the same IP.
+
+Other OS images may name the NIC differently. If detection fails, check `sudo cat /etc/netplan/*.yaml` and set `network_parent_interface`.
 
 ## Security notes
 
@@ -126,7 +175,7 @@ Off by default (`network_configure: false`). Each server has one NIC; the Privat
 
 ## To verify
 
-- Private Network netplan details, DHCP behaviour, NIC name and VLAN id on Elastic Metal; the new Terraform outputs (`*_private_vlan`, `cartography_server_public_ipv4`, `private_network_cidr`) were never applied.
+- The network role itself has only been tested offline (detection logic and template). The netplan layout it produces was verified by hand on the dev app server; the cartography server has not been checked.
 - Whether the L4 NLB preserves client IPs (affects the source rule for 80/443; adjust `base_lb_source_cidrs`).
 - Cloud-init support on the Elastic Metal offers.
 - Ubuntu 26.04 compatibility: Docker repo suite `resolute` (packages 5:29.x were listed, installation untested), k3s support, `ssh.socket` activation (the handler reloads `ssh`), ufw/iptables-nft with k3s.

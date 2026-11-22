@@ -9,6 +9,8 @@
 #   ./tf.sh dev plan -out tfplan-dev
 #   ./tf.sh prod apply tfplan-prod
 #
+# Informational lines go to stderr, so `./tf.sh <env> output -json` is valid JSON on stdout.
+#
 # The state backend is chosen by backend.tf (copy one of the examples):
 #   - backend.s3.tf.example    -> remote S3 state, settings in envs/<env>.backend.hcl
 #   - backend.local.tf.example -> local state in states/<env>/terraform.tfstate
@@ -39,6 +41,16 @@ if [[ ! -f "$varfile" ]]; then
   exit 1
 fi
 
+# If this environment sets project_id, make sure an exported
+# SCW_DEFAULT_PROJECT_ID cannot override it (the environment variable wins
+# over the provider block, which would send a dev run to another project).
+if grep -Eq '^[[:space:]]*project_id[[:space:]]*=[[:space:]]*"' "$varfile"; then
+  if [[ -n "${SCW_DEFAULT_PROJECT_ID:-}" ]]; then
+    echo ">> note: ignoring exported SCW_DEFAULT_PROJECT_ID; using project_id from $varfile" >&2
+  fi
+  unset SCW_DEFAULT_PROJECT_ID
+fi
+
 if [[ ! -f backend.tf ]]; then
   echo "Missing backend.tf. Choose where the state is stored:" >&2
   echo "  remote: cp backend.s3.tf.example backend.tf" >&2
@@ -64,11 +76,11 @@ fi
 
 terraform init -input=false -reconfigure "$backend_arg" > /dev/null
 
-echo ">> environment: $env | vars: $varfile | state: $state_desc"
+echo ">> environment: $env | vars: $varfile | state: $state_desc" >&2
 
 case "$cmd" in
   init)
-    echo "Initialised for $env."
+    echo "Initialised for $env." >&2
     ;;
   plan | apply | destroy | console | import | refresh)
     # apply with a saved plan file does not accept -var-file

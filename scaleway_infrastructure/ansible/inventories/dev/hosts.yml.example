@@ -17,7 +17,7 @@ all:
               ansible_host: 172.16.64.2          # app_server_private_ip
               private_ip: 172.16.64.2            # app_server_private_ip
               public_ip: 203.0.113.20            # app_server_public_ipv4
-              private_vlan: 1234                 # app_server_private_vlan (unverified output)
+              private_vlan: 1234                 # app_server_private_vlan
               # bastion mode: jump through the Public Gateway
               ansible_ssh_common_args: "-o ProxyJump=bastion@198.51.100.10:61000"
               # public mode instead: ansible_host: 203.0.113.20 and no ansible_ssh_common_args
@@ -27,5 +27,5 @@ all:
               ansible_host: 172.16.64.3          # cartography_server_private_ip
               private_ip: 172.16.64.3
               public_ip: 203.0.113.21            # cartography_server_public_ipv4
-              private_vlan: 1235                 # cartography_server_private_vlan (unverified output)
+              private_vlan: 1235                 # cartography_server_private_vlan
               ansible_ssh_common_args: "-o ProxyJump=bastion@198.51.100.10:61000"

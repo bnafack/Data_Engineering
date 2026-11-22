@@ -6,39 +6,94 @@
       - network_vlan_id | int > 0
       - network_vlan_id | int < 4095
       - network_use_dhcp | bool or network_static_address | length > 0
+      - ansible_facts['default_ipv4']['interface'] is defined
     fail_msg: >-
-      The VLAN id is missing. Regenerate the inventory (gen-inventory.sh) after terraform apply,
-      or set network_vlan_id / private_vlan for this host. Without DHCP, set network_static_address.
+      The VLAN id is missing (regenerate the inventory with gen-inventory.sh after terraform apply,
+      or set network_vlan_id / private_vlan for this host), DHCP is off without network_static_address,
+      or the host has no default IPv4 route.
     quiet: true
 
-- name: Install the netplan file for the Private Network VLAN
-  ansible.builtin.template:
-    src: netplan-private.yaml.j2
-    dest: "{{ network_netplan_file }}"
-    owner: root
-    group: root
-    mode: "0600"
-  notify: Apply netplan
+- name: Resolve the VLAN parent (netplan ID, not kernel name)
+  ansible.builtin.include_tasks: detect_parent.yml
 
-- name: Generate the netplan configuration (syntax check, nothing is applied)
-  ansible.builtin.command: netplan generate
-  changed_when: false
+# --- Write, validate, apply -----------------------------------------------------------------------
+- name: Install and validate the netplan file
+  block:
+    - name: Install the netplan file for the Private Network VLAN
+      ansible.builtin.template:
+        src: netplan-private.yaml.j2
+        dest: "{{ network_netplan_file }}"
+        owner: root
+        group: root
+        mode: "0600"
+        backup: true
+      register: network_netplan_file_result
 
-- name: Apply netplan now
-  ansible.builtin.meta: flush_handlers
+    - name: Validate the netplan configuration (nothing is applied)
+      ansible.builtin.command: netplan generate
+      changed_when: false
 
+  rescue:
+    - name: Restore the previous netplan file
+      ansible.builtin.copy:
+        src: "{{ network_netplan_file_result.backup_file }}"
+        dest: "{{ network_netplan_file }}"
+        remote_src: true
+        owner: root
+        group: root
+        mode: "0600"
+      when: (network_netplan_file_result | default({})).backup_file is defined
+
+    - name: Remove the new netplan file (no previous version)
+      ansible.builtin.file:
+        path: "{{ network_netplan_file }}"
+        state: absent
+      when:
+        - network_netplan_file_result | default({}) is changed
+        - (network_netplan_file_result | default({})).backup_file is not defined
+
+    - name: Stop, the generated netplan configuration is invalid
+      ansible.builtin.fail:
+        msg: "netplan generate rejected {{ network_netplan_file }}. The previous state was restored; nothing was applied."
+
+# Inline on purpose (not a handler): the checks below must run after the apply.
+- name: Apply netplan  # noqa: no-handler
+  ansible.builtin.command: netplan apply
+  when: network_netplan_file_result is changed
+  changed_when: true
+
+# --- Verify -----------------------------------------------------------------------------------------
 - name: Wait for the Private Network address
   ansible.builtin.command: "ip -4 -o addr show dev {{ network_vlan_interface }}"
   register: network_addr
   changed_when: false
-  retries: 10
-  delay: 6
+  failed_when: false
+  retries: "{{ network_wait_retries }}"
+  delay: "{{ network_wait_delay }}"
   until: network_addr.rc == 0 and network_addr.stdout | length > 0
 
 - name: Check that the expected private IP is configured
   ansible.builtin.assert:
     that:
-      - network_addr.stdout is search(network_expected_ip ~ '/')
-    fail_msg: "{{ network_vlan_interface }} did not get {{ network_expected_ip }}: {{ network_addr.stdout }}"
+      - network_addr.rc == 0
+      - network_addr.stdout | length > 0
+      - network_expected_ip | length == 0 or network_addr.stdout is search(network_expected_ip ~ '/')
+    fail_msg: >-
+      {{ network_vlan_interface }} did not get {{ network_expected_ip | default('an address', true) }}:
+      {{ network_addr.stdout | default('') }} {{ network_addr.stderr | default('') }}.
+      If DHCP does not answer, set network_use_dhcp: false and network_static_address: "<private_ip>/<prefix>".
     quiet: true
-  when: network_expected_ip | length > 0
+
+- name: Read the default route after apply
+  ansible.builtin.command: ip -4 route show default
+  register: network_default_route
+  changed_when: false
+
+- name: Check that the public default route is unchanged
+  ansible.builtin.assert:
+    that:
+      - network_default_route.stdout is search('dev ' ~ network_public_kernel_name ~ '( |$)')
+    fail_msg: >-
+      The default route is no longer on {{ network_public_kernel_name }}: {{ network_default_route.stdout }}.
+      Check network_dhcp_use_routes (must stay false to keep the public route).
+    quiet: true

@@ -18,7 +18,10 @@ data "scaleway_baremetal_offer" "app" {
 data "scaleway_baremetal_option" "app_private_network" {
   count = var.create_app_server ? 1 : 0
   zone  = var.zone
-  name  = var.app_private_network_option_name
+  # The ID (from find-pn-options.sh) wins over the name: a name lookup takes the
+  # first option with that name in the zone, which may not belong to this offer.
+  option_id = var.app_private_network_option_id
+  name      = var.app_private_network_option_id == null ? var.app_private_network_option_name : null
 }
 
 data "scaleway_baremetal_offer" "cartography" {
@@ -29,9 +32,10 @@ data "scaleway_baremetal_offer" "cartography" {
 }
 
 data "scaleway_baremetal_option" "cartography_private_network" {
-  count = var.create_cartography_server ? 1 : 0
-  zone  = var.zone
-  name  = var.cartography_private_network_option_name
+  count     = var.create_cartography_server ? 1 : 0
+  zone      = var.zone
+  option_id = var.cartography_private_network_option_id
+  name      = var.cartography_private_network_option_id == null ? var.cartography_private_network_option_name : null
 }
 
 resource "scaleway_baremetal_server" "app" {

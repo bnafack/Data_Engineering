@@ -4,10 +4,10 @@
 # Best practice: a dedicated state bucket per environment (ideally in each environment's project).
 bucket = "my-terraform-state-dev-changeme"
 key    = "proposal7/dev/terraform.tfstate"
-region = "fr-par"
+region = "nl-ams"
 
 endpoints = {
-  s3 = "https://s3.fr-par.scw.cloud"
+  s3 = "https://s3.nl-ams.scw.cloud"
 }
 
 skip_credentials_validation = true

@@ -33,6 +33,21 @@ output "app_server_public_ipv4" {
   value       = try(scaleway_baremetal_server.app[0].ipv4[0].address, null)
 }
 
+output "lb_mode" {
+  description = "tls-on-lb (Let's Encrypt certificate on the load balancer) or tcp-passthrough (TLS on the app server)."
+  value       = local.lb_tls_enabled ? "tls-on-lb" : "tcp-passthrough"
+}
+
+output "lb_certificate_id" {
+  description = "ID of the Let's Encrypt certificate of the load balancer (null without lb_domain_names)."
+  value       = one(scaleway_lb_certificate.main[*].id)
+}
+
+output "lb_dns_records_hint" {
+  description = "DNS records to create at your DNS provider (LWS) BEFORE adding lb_domain_names."
+  value       = [for d in var.lb_domain_names : "${d}. A ${scaleway_lb_ip.lb.ip_address}"]
+}
+
 output "lb_public_ip" {
   description = "Public IP of the load balancer (point DNS here)."
   value       = scaleway_lb_ip.lb.ip_address
@@ -104,6 +119,16 @@ output "app_api_secret_key" {
   description = "Secret key of the application API key."
   value       = scaleway_iam_api_key.app.secret_key
   sensitive   = true
+}
+
+output "secrets" {
+  description = "Secret Manager secrets created by this stack: name => { id, path }."
+  value       = { for k, s in scaleway_secret.main : k => { id = s.id, path = s.path } }
+}
+
+output "secrets_read_hint" {
+  description = "How to read a secret with the scw CLI."
+  value       = var.secrets_enabled ? "scw secret version access-by-path secret-path=${local.secrets_path} secret-name=db-app revision=latest region=${var.region}" : null
 }
 
 output "generative_apis_usage_hint" {

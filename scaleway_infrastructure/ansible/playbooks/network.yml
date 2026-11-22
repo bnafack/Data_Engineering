@@ -2,7 +2,7 @@
 - name: Import the environment guard
   ansible.builtin.import_playbook: guard.yml
 
-- name: Private Network VLAN interface (opt-in, UNVERIFIED)
+- name: Private Network VLAN interface (opt-in)
   hosts: servers
   become: true
   gather_facts: true

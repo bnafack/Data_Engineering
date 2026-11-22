@@ -1,6 +1,7 @@
 # Copy to terraform.tfvars (git-ignored): cp terraform.tfvars.example terraform.tfvars
 # Never put API keys here: use the SCW_ACCESS_KEY / SCW_SECRET_KEY /
-# SCW_DEFAULT_PROJECT_ID environment variables.
+# SCW_DEFAULT_ORGANIZATION_ID environment variables.
+# Set project_id below instead of exporting SCW_DEFAULT_PROJECT_ID.
 #
 # Every variable of variables.tf is listed below.
 # Values marked REQUIRED have no default and must be set.
@@ -9,7 +10,7 @@
 # ---------------------------------------------------------------------------
 # General
 # ---------------------------------------------------------------------------
-project_id  = null # null = use SCW_DEFAULT_PROJECT_ID
+project_id  = null # set your project ID here (null needs SCW_DEFAULT_PROJECT_ID and the "read project" permission)
 region      = "fr-par"
 zone        = "fr-par-1"
 name_prefix = "proposal7"
@@ -44,6 +45,12 @@ lb_type        = "LB-S"
 app_http_port  = 80
 app_https_port = 443
 
+# Optional Let's Encrypt certificate on the load balancer (TLS terminated on the LB).
+# [] = no certificate, TCP pass-through (TLS on the app server).
+# The names must already point to lb_public_ip (A record at LWS) before apply.
+lb_domain_names           = []   # e.g. ["app.example.com", "www.example.com"]
+lb_health_check_http_path = null # e.g. "/healthz" (null = TCP health check)
+
 # ---------------------------------------------------------------------------
 # Bare metal servers (billed as soon as created)
 # ---------------------------------------------------------------------------
@@ -56,6 +63,11 @@ cartography_offer_name = "EM-B420E-NVMe"
 
 app_private_network_option_name         = "Private Networks 1 Gbps feature"
 cartography_private_network_option_name = "Private Networks 10 Gbps feature"
+
+# Recommended: the exact option IDs of your offers (they override the names).
+# Find them with: ./find-pn-options.sh <zone> <offer-name> [hourly|monthly]
+app_private_network_option_id         = null
+cartography_private_network_option_id = null
 
 # Alternative cartography server (cheaper, 256 GB RAM, SATA SSD):
 # cartography_offer_name                  = "EM-B212X-SSD"
@@ -100,3 +112,11 @@ registry_namespace_name = null
 
 # Allow terraform destroy to delete non-empty buckets (keep false in production).
 buckets_force_destroy = false
+
+# ---------------------------------------------------------------------------
+# Secret Manager (database passwords, application API key)
+# ---------------------------------------------------------------------------
+secrets_enabled          = true
+secrets_path             = null  # null = "/<name_prefix>", e.g. /dev
+secrets_protected        = false # true = cannot be deleted until protection is removed
+secrets_grant_app_access = true  # the application identity can read the project's secrets

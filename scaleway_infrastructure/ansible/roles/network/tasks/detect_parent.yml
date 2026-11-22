@@ -1,0 +1,71 @@
+---
+# Resolve the netplan ID of the VLAN parent (e.g. eth0), not its kernel name (e.g. eno1).
+# Sets: network_public_kernel_name, network_public_mac, network_parent_netplan_id.
+
+- name: Remember the public (default-route) interface
+  ansible.builtin.set_fact:
+    network_public_kernel_name: "{{ ansible_facts['default_ipv4']['interface'] }}"
+    network_public_mac: >-
+      {{ (ansible_facts[ansible_facts['default_ipv4']['interface'] | replace('-', '_')]['macaddress']
+          | default('')) | lower }}
+
+- name: Find the existing netplan files
+  ansible.builtin.find:
+    paths: "{{ network_netplan_dir }}"
+    patterns: ["*.yaml", "*.yml"]
+    excludes: ["{{ network_netplan_file | basename }}"]
+  register: network_netplan_files
+  when: network_parent_interface | length == 0
+
+- name: Read the existing netplan files
+  ansible.builtin.slurp:
+    src: "{{ item.path }}"
+  loop: "{{ network_netplan_files.files | default([]) }}"
+  loop_control:
+    label: "{{ item.path }}"
+  register: network_netplan_raw
+  when: network_parent_interface | length == 0
+
+- name: List the netplan ethernets matching the public interface
+  ansible.builtin.set_fact:
+    network_parent_candidates_json: >-
+      {%- set ns = namespace(ids=[]) -%}
+      {%- for f in network_netplan_raw.results | default([]) if f.content is defined -%}
+      {%-   set doc = (f.content | b64decode | from_yaml) or {} -%}
+      {%-   set eths = ((doc.network | default({})) or {}).ethernets | default({}) -%}
+      {%-   for id, cfg in (eths or {}).items() -%}
+      {%-     set c = cfg if cfg is mapping else {} -%}
+      {%-     set m = c.match if (c.match is defined and c.match is mapping) else {} -%}
+      {%-     if (network_public_mac | length > 0 and (m.macaddress | default('') | lower) == network_public_mac)
+                 or id == network_public_kernel_name
+                 or (c['set-name'] | default('')) == network_public_kernel_name -%}
+      {%-       set ns.ids = ns.ids + [id] -%}
+      {%-     endif -%}
+      {%-   endfor -%}
+      {%- endfor -%}
+      {{ ns.ids | unique | list | to_json }}
+  when: network_parent_interface | length == 0
+
+- name: Choose the VLAN parent
+  ansible.builtin.set_fact:
+    network_parent_netplan_id: >-
+      {{ network_parent_interface if network_parent_interface | length > 0
+         else (network_parent_candidates_json | from_json | first | default('')) }}
+
+- name: Check that the VLAN parent was found
+  ansible.builtin.assert:
+    that:
+      - network_parent_netplan_id | length > 0
+      - network_parent_interface | length > 0 or (network_parent_candidates_json | from_json | length) == 1
+    fail_msg: >-
+      Could not find exactly one netplan ethernet for {{ network_public_kernel_name }} (MAC {{ network_public_mac }})
+      in {{ network_netplan_dir }} (found: {{ network_parent_candidates_json | default('[]') }}).
+      Check `sudo cat {{ network_netplan_dir }}/*.yaml` and set network_parent_interface to the key under
+      `ethernets:` (e.g. eth0).
+    quiet: true
+
+- name: Show the resolved interfaces
+  ansible.builtin.debug:
+    msg: >-
+      VLAN {{ network_vlan_interface }} (id {{ network_vlan_id }}) on netplan parent {{ network_parent_netplan_id }}
+      (kernel {{ network_public_kernel_name }}, MAC {{ network_public_mac }})

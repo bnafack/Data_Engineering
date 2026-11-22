@@ -37,6 +37,12 @@ lb_type        = "LB-S"
 app_http_port  = 80
 app_https_port = 443
 
+# Optional Let's Encrypt certificate on the load balancer (TLS terminated on the LB).
+# [] = no certificate, TCP pass-through (TLS on the app server).
+# The names must already point to lb_public_ip (A record at LWS) before apply.
+lb_domain_names           = []   # e.g. ["app.example.com", "www.example.com"]
+lb_health_check_http_path = null # e.g. "/healthz" (null = TCP health check)
+
 # ---------------------------------------------------------------------------
 # Bare metal servers (billed as soon as created)
 # ---------------------------------------------------------------------------
@@ -48,6 +54,11 @@ cartography_offer_name = "EM-B420E-NVMe"
 
 app_private_network_option_name         = "Private Networks 1 Gbps feature"
 cartography_private_network_option_name = "Private Networks 10 Gbps feature"
+
+# Recommended: the exact option IDs of your offers (they override the names).
+# Find them with: ./find-pn-options.sh fr-par-1 <offer-name> monthly
+app_private_network_option_id         = null
+cartography_private_network_option_id = null
 
 os_name                   = "Ubuntu"
 os_version                = "26.04 LTS (Resolute Raccoon)"
@@ -86,3 +97,11 @@ registry_namespace_name = null
 
 # Keep false in production: buckets that still contain data cannot be destroyed.
 buckets_force_destroy = false
+
+# ---------------------------------------------------------------------------
+# Secret Manager (database passwords, application API key)
+# ---------------------------------------------------------------------------
+secrets_enabled          = true
+secrets_path             = null # null = "/<name_prefix>", e.g. /dev
+secrets_protected        = true # true = cannot be deleted until protection is removed
+secrets_grant_app_access = true # the application identity can read the project's secrets
