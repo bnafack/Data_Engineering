@@ -1,13 +1,15 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1520 800" width="1520" height="800" font-family="Segoe UI, Arial, sans-serif" role="img" aria-label="Proposal 7 – Elastic Metal app server and Elastic Metal cartography server in private network, no Redis">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1700 800" width="1700" height="800" font-family="Segoe UI, Arial, sans-serif" role="img" aria-label="Proposal 7 – Elastic Metal app server and Elastic Metal cartography server in private network, no Redis, AWS SES for email marketing, AWS SMS, Scaleway Secret Manager and Key Manager">
   <defs>
     <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker>
     <marker id="arrY" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#ca8a04"/></marker>
     <marker id="arrP" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#4f0599"/></marker>
+    <marker id="arrA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#d97706"/></marker>
+    <marker id="arrK" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#db2777"/></marker>
     <filter id="sh" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.18"/></filter>
   </defs>
 
-  <rect width="1520" height="800" fill="#f8fafc"/>
-  <text x="30" y="42" font-size="22" font-weight="700" fill="#0f172a">Proposal 7 – Elastic Metal app server + Elastic Metal cartography (private) · no Redis</text>
+  <rect width="1700" height="800" fill="#f8fafc"/>
+  <text x="30" y="42" font-size="22" font-weight="700" fill="#0f172a">Proposal 7 – Elastic Metal app + cartography (private) · AWS SES + SMS · Key Manager · no Redis</text>
 
   <!-- Scaleway cloud boundary -->
   <rect x="190" y="70" width="1150" height="650" rx="16" fill="#faf5ff" stroke="#4f0599" stroke-width="2"/>
@@ -33,6 +35,18 @@
   <g filter="url(#sh)"><rect x="30" y="640" width="140" height="60" rx="10" fill="#ffffff" stroke="#64748b" stroke-width="1.5"/></g>
   <text x="100" y="666" font-size="14" font-weight="600" text-anchor="middle" fill="#0f172a">📁 Git Repo</text>
   <text x="100" y="685" font-size="12" text-anchor="middle" fill="#475569">Deploy manifests</text>
+
+  <!-- Key Manager -->
+  <g filter="url(#sh)"><rect x="215" y="120" width="140" height="65" rx="10" fill="#fce7f3" stroke="#db2777" stroke-width="2"/></g>
+  <text x="285" y="145" font-size="13" font-weight="700" text-anchor="middle" fill="#9d174d">🗝️ Key Manager</text>
+  <text x="285" y="162" font-size="10.5" text-anchor="middle" fill="#9d174d">encryption keys</text>
+  <text x="285" y="176" font-size="10.5" text-anchor="middle" fill="#9d174d">rotation · audit</text>
+
+  <!-- Secret Manager -->
+  <g filter="url(#sh)"><rect x="415" y="120" width="140" height="65" rx="10" fill="#fce7f3" stroke="#db2777" stroke-width="2"/></g>
+  <text x="485" y="145" font-size="13" font-weight="700" text-anchor="middle" fill="#9d174d">🔑 Secret Manager</text>
+  <text x="485" y="162" font-size="10.5" text-anchor="middle" fill="#9d174d">DB · API · AWS keys</text>
+  <text x="485" y="176" font-size="10.5" text-anchor="middle" fill="#9d174d">encrypted with a key</text>
 
   <!-- WAF -->
   <g filter="url(#sh)"><rect x="215" y="335" width="140" height="70" rx="10" fill="#fff7ed" stroke="#f97316" stroke-width="2"/></g>
@@ -89,7 +103,7 @@
   <!-- Public Gateway + Bastion -->
   <g filter="url(#sh)"><rect x="880" y="470" width="230" height="95" rx="10" fill="#fef9c3" stroke="#ca8a04" stroke-width="2"/></g>
   <text x="995" y="492" font-size="15" font-weight="700" text-anchor="middle" fill="#713f12">🚪 Public Gateway</text>
-  <text x="995" y="510" font-size="12" text-anchor="middle" fill="#854d0e">NAT – outbound (patching, AI)</text>
+  <text x="995" y="510" font-size="12" text-anchor="middle" fill="#854d0e">NAT – outbound (patching, AI, AWS)</text>
   <rect x="905" y="525" width="180" height="28" rx="6" fill="#ffffff" stroke="#ca8a04"/>
   <text x="995" y="544" font-size="12" font-weight="700" text-anchor="middle" fill="#854d0e">🔐 SSH Bastion :61000</text>
 
@@ -100,28 +114,42 @@
   <text x="1240" y="288" font-size="12" text-anchor="middle" fill="#4f0599">OpenAI-compatible API</text>
   <text x="1240" y="306" font-size="12" text-anchor="middle" fill="#4f0599">IAM API key · EU hosted</text>
 
-  <!-- OS patch repos -->
-  <g filter="url(#sh)"><rect x="1155" y="480" width="170" height="70" rx="10" fill="#ffffff" stroke="#64748b" stroke-width="1.5"/></g>
-  <text x="1240" y="507" font-size="14" font-weight="700" text-anchor="middle" fill="#0f172a">🩹 OS Patch Repos</text>
-  <text x="1240" y="527" font-size="11" text-anchor="middle" fill="#475569">apt / Docker Hub</text>
+  <!-- Alternative cartography server (cheaper) -->
+  <rect x="600" y="622" width="510" height="80" rx="10" fill="#ffffff" stroke="#4338ca" stroke-dasharray="5 4"/>
+  <text x="614" y="642" font-size="11" font-weight="700" fill="#312e81">Alternative cartography server (cheaper): EM-B212X-SSD</text>
+  <text x="614" y="660" font-size="10.5" fill="#3730a3">2 × Xeon E5 v4 · 8C/16T · 256 GB · 2 × 1 TB SSD · 1 Gbps private</text>
+  <text x="614" y="678" font-size="10.5" font-weight="600" fill="#312e81">€115.99 + €9.99 Private Net = €125.98 / month</text>
+  <text x="614" y="694" font-size="10" fill="#3730a3">replaces EM-B420E-NVMe (€179.98 / month)</text>
 
-  <!-- Alternative cartography server -->
-  <rect x="1155" y="575" width="170" height="125" rx="10" fill="#ffffff" stroke="#4338ca" stroke-dasharray="5 4"/>
-  <text x="1167" y="594" font-size="11" font-weight="700" fill="#312e81">Alternative (cheaper)</text>
-  <text x="1167" y="611" font-size="10.5" fill="#3730a3">EM-B212X-SSD</text>
-  <text x="1167" y="626" font-size="10" fill="#3730a3">2 × Xeon E5 v4 · 8C/16T</text>
-  <text x="1167" y="641" font-size="10" fill="#3730a3">256 GB · 2 × 1 TB SSD</text>
-  <text x="1167" y="656" font-size="10" fill="#3730a3">1 Gbps private</text>
-  <text x="1167" y="674" font-size="10" font-weight="600" fill="#312e81">€115.99 + €9.99 Private Net</text>
-  <text x="1167" y="690" font-size="10" fill="#3730a3">= €125.98 / month</text>
+  <!-- AWS (outside Scaleway) -->
+  <rect x="1365" y="325" width="320" height="255" rx="14" fill="#fffbeb" stroke="#f59e0b" stroke-width="2" stroke-dasharray="8 5"/>
+  <text x="1380" y="347" font-size="14" font-weight="700" fill="#b45309">☁️ AWS (outside Scaleway)</text>
+
+  <g filter="url(#sh)"><rect x="1385" y="360" width="280" height="80" rx="10" fill="#ffffff" stroke="#f59e0b" stroke-width="2"/></g>
+  <text x="1525" y="383" font-size="14" font-weight="700" text-anchor="middle" fill="#92400e">✉️ AWS SES</text>
+  <text x="1525" y="402" font-size="11.5" font-weight="600" text-anchor="middle" fill="#92400e">Email marketing</text>
+  <text x="1525" y="419" font-size="10.5" text-anchor="middle" fill="#b45309">campaigns · API / SMTP over TLS</text>
+  <text x="1525" y="433" font-size="10.5" text-anchor="middle" fill="#b45309">DKIM · SPF · DMARC on your domain</text>
+
+  <g filter="url(#sh)"><rect x="1385" y="475" width="280" height="80" rx="10" fill="#ffffff" stroke="#f59e0b" stroke-width="2"/></g>
+  <text x="1525" y="498" font-size="14" font-weight="700" text-anchor="middle" fill="#92400e">📱 AWS SMS</text>
+  <text x="1525" y="517" font-size="11.5" font-weight="600" text-anchor="middle" fill="#92400e">SMS messages</text>
+  <text x="1525" y="534" font-size="10.5" text-anchor="middle" fill="#b45309">End User Messaging SMS · API over TLS</text>
+  <text x="1525" y="548" font-size="10.5" text-anchor="middle" fill="#b45309">origination ID · opt-out handling</text>
+
+  <!-- OS patch repos (internet) -->
+  <g filter="url(#sh)"><rect x="1370" y="595" width="310" height="60" rx="10" fill="#ffffff" stroke="#64748b" stroke-width="1.5"/></g>
+  <text x="1525" y="621" font-size="14" font-weight="700" text-anchor="middle" fill="#0f172a">🩹 OS Patch Repos</text>
+  <text x="1525" y="639" font-size="11" text-anchor="middle" fill="#475569">apt / Docker Hub (Internet)</text>
 
   <!-- Trade-offs note -->
-  <rect x="215" y="580" width="340" height="82" rx="10" fill="#fff7ed" stroke="#f59e0b"/>
+  <rect x="215" y="580" width="340" height="98" rx="10" fill="#fff7ed" stroke="#f59e0b"/>
   <text x="227" y="598" font-size="12" font-weight="700" fill="#92400e">⚠️ Trade-offs</text>
   <text x="227" y="614" font-size="10.5" fill="#78350f">• Each server is a single point of failure (hours to repair)</text>
   <text x="227" y="629" font-size="10.5" fill="#78350f">• No Redis: use PostgreSQL / in-app cache</text>
   <text x="227" y="644" font-size="10.5" fill="#78350f">• Local disks not replicated: back up map data to S3</text>
   <text x="227" y="659" font-size="10.5" fill="#78350f">• Optional: 2nd app server behind the NLB</text>
+  <text x="227" y="674" font-size="10.5" fill="#78350f">• AWS SES / SMS: data leaves Scaleway (GDPR, DPA with AWS)</text>
 
   <!-- Arrows -->
   <g stroke="#475569" stroke-width="2" fill="none" marker-end="url(#arr)">
@@ -135,13 +163,19 @@
     <path d="M842 485 H878"/>
     <path d="M170 690 H575 V470 H588"/>
     <path d="M170 562 H866 V539 H903"/>
-    <line x1="1110" y1="515" x2="1153" y2="515"/>
     <line x1="100" y1="640" x2="100" y2="597"/>
+    <path d="M1110 550 H1180 V625 H1368"/>
   </g>
   <!-- Bastion SSH to app server (dashed) -->
   <path d="M903 531 H878 V503 H842" stroke="#ca8a04" stroke-width="2" stroke-dasharray="6 4" fill="none" marker-end="url(#arrY)"/>
   <!-- Gateway to Generative APIs -->
-  <path d="M1110 490 C1140 490 1135 290 1153 290" stroke="#4f0599" stroke-width="2.5" fill="none" marker-end="url(#arrP)"/>
+  <path d="M1110 476 H1140 V290 H1153" stroke="#4f0599" stroke-width="2.5" fill="none" marker-end="url(#arrP)"/>
+  <!-- Gateway to AWS SES and AWS SMS -->
+  <path d="M1110 492 H1152 V400 H1383" stroke="#d97706" stroke-width="2.5" fill="none" marker-end="url(#arrA)"/>
+  <path d="M1110 515 H1383" stroke="#d97706" stroke-width="2.5" fill="none" marker-end="url(#arrA)"/>
+  <!-- Key Manager encrypts Secret Manager; app server reads secrets -->
+  <line x1="357" y1="152" x2="413" y2="152" stroke="#db2777" stroke-width="2" marker-end="url(#arrK)"/>
+  <path d="M485 187 V300 H588" stroke="#db2777" stroke-width="2" stroke-dasharray="6 4" fill="none" marker-start="url(#arrK)"/>
 
   <!-- Labels -->
   <g font-size="11" fill="#334155">
@@ -149,14 +183,18 @@
     <text x="846" y="264" font-size="9">SQL</text>
     <text x="846" y="384" font-size="9">private</text>
     <text x="846" y="479" font-size="9">egress</text>
-    <text x="846" y="518" font-size="9" fill="#854d0e">SSH :22</text>
+    <text x="843" y="498" font-size="9" fill="#854d0e">SSH :22</text>
     <text x="668" y="225" transform="rotate(-90 668 225)">pull images</text>
     <text x="830" y="205">documents</text>
-    <text x="230" y="683">GitOps sync</text>
     <text x="190" y="555">SSH :61000 → bastion</text>
-    <text x="1114" y="530">patching</text>
-    <text x="1118" y="400" fill="#4f0599" font-weight="600">AI calls</text>
+    <text x="1200" y="623">patching</text>
+    <text x="1190" y="394" fill="#b45309" font-weight="600">emails (HTTPS)</text>
+    <text x="1190" y="509" fill="#b45309" font-weight="600">SMS (HTTPS)</text>
+    <text x="1160" y="346" font-size="10" fill="#4f0599" font-weight="600">AI calls (HTTPS)</text>
+    <text x="360" y="146" font-size="9" fill="#9d174d" font-weight="600">encrypts</text>
+    <text x="492" y="255" font-size="10" fill="#9d174d" font-weight="600">reads secrets</text>
   </g>
+  <text x="230" y="706" font-size="11" fill="#334155">GitOps sync</text>
 
   <!-- Legend -->
   <g font-size="12" fill="#334155">
@@ -167,7 +205,9 @@
     <rect x="485" y="745" width="14" height="14" fill="#dcfce7" stroke="#16a34a"/><text x="505" y="757">Managed DB</text>
     <rect x="595" y="745" width="14" height="14" fill="#f3e8ff" stroke="#9333ea"/><text x="615" y="757">Storage</text>
     <rect x="680" y="745" width="14" height="14" fill="#ede9fe" stroke="#4f0599"/><text x="700" y="757">AI (Generative APIs)</text>
-    <line x1="840" y1="752" x2="870" y2="752" stroke="#ca8a04" stroke-width="2" stroke-dasharray="6 4"/><text x="876" y="757">Admin SSH via bastion</text>
-    <text x="1030" y="757" font-weight="600">App €54.99 + Carto €179.98 + LB, Gateway, managed PG</text>
+    <rect x="840" y="745" width="14" height="14" fill="#fce7f3" stroke="#db2777"/><text x="860" y="757">Secret / Key Manager</text>
+    <rect x="1010" y="745" width="14" height="14" fill="#fffbeb" stroke="#f59e0b"/><text x="1030" y="757">AWS (email, SMS)</text>
+    <line x1="1160" y1="752" x2="1190" y2="752" stroke="#ca8a04" stroke-width="2" stroke-dasharray="6 4"/><text x="1196" y="757">Admin SSH via bastion</text>
+    <text x="30" y="782" font-weight="600">App €54.99 + Carto €179.98 + LB, Gateway, managed PG, Secret / Key Manager · AWS SES and SMS billed per use by AWS</text>
   </g>
 </svg>

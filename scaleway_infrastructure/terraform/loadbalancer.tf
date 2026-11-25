@@ -8,31 +8,36 @@
 #                                    BEFORE the certificate is created (see README "Load balancer certificate").
 
 locals {
-  lb_tls_enabled = length(var.lb_domain_names) > 0
+  lb_enabled     = var.create_load_balancer
+  lb_tls_enabled = local.lb_enabled && length(var.lb_domain_names) > 0
 
   # TCP pass-through (no certificate)
-  lb_tcp_ports = var.create_app_server && !local.lb_tls_enabled ? {
+  lb_tcp_ports = local.lb_enabled && var.create_app_server && !local.lb_tls_enabled ? {
     http  = var.app_http_port
     https = var.app_https_port
   } : {}
 
   # TLS on the load balancer: public port => use the certificate or not
-  lb_http_frontends = var.create_app_server && local.lb_tls_enabled ? {
+  lb_http_frontends = local.lb_enabled && var.create_app_server && local.lb_tls_enabled ? {
     http  = { port = 80, tls = false }
     https = { port = 443, tls = true }
   } : {}
 }
 
 resource "scaleway_lb_ip" "lb" {
+  count = local.lb_enabled ? 1 : 0
+
   zone = var.zone
   tags = var.tags
 }
 
 resource "scaleway_lb" "main" {
+  count = local.lb_enabled ? 1 : 0
+
   name   = "${var.name_prefix}-lb"
   type   = var.lb_type
   zone   = var.zone
-  ip_ids = [scaleway_lb_ip.lb.id]
+  ip_ids = [scaleway_lb_ip.lb[0].id]
   tags   = var.tags
 
   private_network {
@@ -46,7 +51,7 @@ resource "scaleway_lb" "main" {
 resource "scaleway_lb_backend" "tcp" {
   for_each = local.lb_tcp_ports
 
-  lb_id                  = scaleway_lb.main.id
+  lb_id                  = scaleway_lb.main[0].id
   name                   = "${var.name_prefix}-${each.key}"
   forward_protocol       = "tcp"
   forward_port           = each.value
@@ -64,7 +69,7 @@ resource "scaleway_lb_backend" "tcp" {
 resource "scaleway_lb_frontend" "tcp" {
   for_each = local.lb_tcp_ports
 
-  lb_id        = scaleway_lb.main.id
+  lb_id        = scaleway_lb.main[0].id
   backend_id   = scaleway_lb_backend.tcp[each.key].id
   name         = "${var.name_prefix}-${each.key}"
   inbound_port = each.value
@@ -76,7 +81,7 @@ resource "scaleway_lb_frontend" "tcp" {
 resource "scaleway_lb_certificate" "main" {
   count = local.lb_tls_enabled ? 1 : 0
 
-  lb_id = scaleway_lb.main.id
+  lb_id = scaleway_lb.main[0].id
   # The name changes with the domains, so a new certificate can be created before the old one is removed.
   name = "${var.name_prefix}-${substr(sha1(join(",", var.lb_domain_names)), 0, 8)}"
 
@@ -93,7 +98,7 @@ resource "scaleway_lb_certificate" "main" {
 resource "scaleway_lb_backend" "http" {
   count = length(local.lb_http_frontends) > 0 ? 1 : 0
 
-  lb_id                  = scaleway_lb.main.id
+  lb_id                  = scaleway_lb.main[0].id
   name                   = "${var.name_prefix}-http"
   forward_protocol       = "http"
   forward_port           = var.app_http_port
@@ -123,7 +128,7 @@ resource "scaleway_lb_backend" "http" {
 resource "scaleway_lb_frontend" "http" {
   for_each = local.lb_http_frontends
 
-  lb_id           = scaleway_lb.main.id
+  lb_id           = scaleway_lb.main[0].id
   backend_id      = scaleway_lb_backend.http[0].id
   name            = "${var.name_prefix}-${each.key}"
   inbound_port    = each.value.port

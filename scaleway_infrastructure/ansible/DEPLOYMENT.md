@@ -93,6 +93,8 @@ Two modes:
 | `--mode public` | the public IP (`51.158.200.240`) | first run, before the VLAN exists |
 | `--mode bastion` | the private IP (`172.16.64.5`) through `bastion@51.15.57.196:61000` | once the VLAN works (normal mode) |
 
+Without a Public Gateway (`create_public_gateway = false` in Terraform) there is no bastion: only `--mode public` works (`--mode bastion` stops with "gateway_public_ip is null"). In that case list your admin IPs in `admin_cidrs` instead of the Private Network range, and without a load balancer add them to `base_lb_source_cidrs` to reach ports 80/443 on the server's public IP.
+
 ```bash
 ./gen-inventory.sh dev --mode public
 ```
