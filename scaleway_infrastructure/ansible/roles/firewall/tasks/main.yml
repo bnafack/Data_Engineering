@@ -1,0 +1,115 @@
+---
+# Lockout safety, in this order:
+#   1. checks.yml refuses to run if the current SSH connection would be blocked
+#   2. SSH allow rules are added BEFORE ufw is enabled
+#   3. a check refuses to enable ufw if no SSH allow rule exists
+#   4. on the first enable, a transient timer disables ufw again unless a new connection is confirmed
+- name: Check the settings and the current connection
+  ansible.builtin.import_tasks: checks.yml
+
+- name: Install ufw
+  ansible.builtin.apt:
+    name: ufw
+    state: present
+
+- name: Delete all existing ufw rules (firewall_reset)
+  community.general.ufw:
+    state: reset
+  when: firewall_reset | bool
+
+- name: Read the current ufw state
+  ansible.builtin.command: ufw status
+  register: firewall_ufw_status
+  changed_when: false
+  check_mode: false
+
+- name: Remember whether ufw is currently inactive
+  ansible.builtin.set_fact:
+    firewall_was_inactive: "{{ 'inactive' in firewall_ufw_status.stdout | lower }}"
+
+- name: Default deny incoming
+  community.general.ufw:
+    default: deny
+    direction: incoming
+
+- name: Default allow outgoing
+  community.general.ufw:
+    default: allow
+    direction: outgoing
+
+- name: Allow SSH from the chosen CIDRs
+  community.general.ufw:
+    rule: allow
+    port: "{{ firewall_ssh_port | string }}"
+    proto: tcp
+    src: "{{ item }}"
+    comment: "ssh"
+  loop: "{{ firewall_ssh_from }}"
+
+- name: Allow the extra ports
+  community.general.ufw:
+    rule: allow
+    port: "{{ item.port | string }}"
+    proto: "{{ item.proto | default('tcp') }}"
+    src: "{{ item.src | default(private_network_cidr) }}"
+    comment: "{{ item.comment | default('ansible firewall') }}"
+  loop: "{{ firewall_allow }}"
+  loop_control:
+    label: "{{ item.port }}/{{ item.proto | default('tcp') }} from {{ item.src | default(private_network_cidr) }}"
+
+- name: List the rules that ufw will enforce
+  ansible.builtin.command: ufw show added
+  register: firewall_ufw_added
+  changed_when: false
+  check_mode: false
+
+- name: Refuse to enable ufw without an SSH allow rule
+  ansible.builtin.assert:
+    that:
+      - firewall_ufw_added.stdout is search('(port |allow )' ~ firewall_ssh_port ~ '[ /]')
+    fail_msg: "No ufw rule allows SSH on port {{ firewall_ssh_port }}: not enabling the firewall."
+    quiet: true
+
+- name: Arm the rollback timer (disables ufw if the connection is lost)
+  ansible.builtin.command: >-
+    systemd-run --unit=ufw-rollback-{{ ansible_facts['date_time']['epoch'] }}
+    --on-active={{ firewall_rollback_seconds }}s /usr/sbin/ufw disable
+  register: firewall_rollback_timer
+  changed_when: true
+  when:
+    - firewall_enable | bool
+    - firewall_was_inactive | bool
+    - firewall_rollback_seconds | int > 0
+
+- name: Enable ufw
+  community.general.ufw:
+    state: enabled
+    logging: low
+  when: firewall_enable | bool
+
+- name: Confirm the SSH connection still works after enabling ufw
+  when: firewall_rollback_timer is not skipped
+  block:
+    - name: Drop the current SSH connection
+      ansible.builtin.meta: reset_connection
+
+    - name: Wait for a new SSH connection
+      ansible.builtin.wait_for_connection:
+        timeout: "{{ [firewall_rollback_seconds | int - 30, 30] | max }}"
+
+    - name: Cancel the rollback timer
+      ansible.builtin.systemd_service:
+        name: "ufw-rollback-{{ ansible_facts['date_time']['epoch'] }}.timer"
+        state: stopped
+
+- name: Show the active rules
+  ansible.builtin.command: ufw status numbered
+  register: firewall_final
+  changed_when: false
+  check_mode: false
+  when: firewall_enable | bool
+
+- name: Rules now enforced
+  ansible.builtin.debug:
+    msg: "{{ firewall_final.stdout_lines }}"
+  when: firewall_final is not skipped

@@ -16,7 +16,9 @@ tags        = ["prod", "terraform"]
 # ---------------------------------------------------------------------------
 # Network (different range from dev)
 # ---------------------------------------------------------------------------
-private_network_cidr  = "172.16.68.0/22"
+private_network_cidr = "172.16.68.0/22"
+# Public Gateway (SSH bastion), billed hourly (~23 EUR/month). false = no bastion.
+create_public_gateway = true
 gateway_type          = "VPC-GW-S"
 bastion_port          = 61000
 bastion_allowed_cidrs = ["203.0.113.10/32"] # REQUIRED: strict admin IPs only, never empty
@@ -33,9 +35,11 @@ server_ssh_user = "ubuntu"
 # ---------------------------------------------------------------------------
 # Load balancer
 # ---------------------------------------------------------------------------
-lb_type        = "LB-S"
-app_http_port  = 80
-app_https_port = 443
+# Load balancer, billed hourly (~20 EUR/month). false = no load balancer.
+create_load_balancer = true
+lb_type              = "LB-S"
+app_http_port        = 80
+app_https_port       = 443
 
 # Optional Let's Encrypt certificate on the load balancer (TLS terminated on the LB).
 # [] = no certificate, TCP pass-through (TLS on the app server).

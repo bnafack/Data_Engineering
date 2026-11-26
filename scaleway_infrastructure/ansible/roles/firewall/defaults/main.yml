@@ -1,0 +1,41 @@
+---
+# Simple host firewall (ufw). Incoming traffic is denied by default; only what is listed here is allowed.
+# Elastic Metal servers always have a public IPv4, so this firewall is what blocks it.
+
+# SSH port.
+firewall_ssh_port: 22
+
+# Who may connect with SSH, as CIDRs.
+# Default: only the Private Network, which means SSH through the bastion and nothing from the public IP.
+# To also allow your own address: add "<your-ip>/32".
+firewall_ssh_from:
+  - "{{ private_network_cidr | default('') }}"
+
+# Extra ports to open. Each item:
+#   port:     number or range ("8000:8100")                      required
+#   src:      CIDR or "any"                                     default: the Private Network
+#   proto:    tcp or udp                                        default: tcp
+#   comment:  free text                                         default: "ansible firewall"
+# Example:
+#   firewall_allow:
+#     - { port: 80,  src: 172.16.64.0/22, comment: load balancer }
+#     - { port: 443, src: 172.16.64.0/22, comment: load balancer }
+#     - { port: 8080, src: 203.0.113.10/32, comment: my test from home }
+firewall_allow: []
+
+# true  = enable ufw (default).
+# false = write the rules but leave ufw as it is (review with `sudo ufw show added`).
+firewall_enable: true
+
+# true = delete ALL existing ufw rules first (also the ones added by other roles, such as k3s), so the
+# list above is the whole truth. false = rules you remove from the list stay until you delete them
+# by hand (`sudo ufw status numbered`, then `sudo ufw delete <n>`).
+firewall_reset: false
+
+# Refuse to run when the current SSH connection comes from an address that firewall_ssh_from would block
+# (for example connected over the public IP while only the Private Network is allowed).
+firewall_check_ssh_source: true
+
+# Safety net on the first enable: a transient timer disables ufw again after this many seconds unless a new
+# SSH connection is confirmed. 0 disables the safety net.
+firewall_rollback_seconds: 120

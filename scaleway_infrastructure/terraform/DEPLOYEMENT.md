@@ -51,6 +51,7 @@ export SCW_SECRET_KEY=...
 export SCW_DEFAULT_ORGANIZATION_ID=...
 unset SCW_DEFAULT_PROJECT_ID     # the project comes from project_id in envs/<env>.tfvars
 
+
 # Only for the remote S3 state backend (step 3, option A):
 export AWS_ACCESS_KEY_ID="$SCW_ACCESS_KEY"
 export AWS_SECRET_ACCESS_KEY="$SCW_SECRET_KEY"
@@ -137,12 +138,12 @@ Add to `~/.ssh/config` (use the private key matching one of `ssh_public_keys`):
 
 ```
 Host dev-db
-  HostName <gateway_public_ip>
+  HostName <gateway_public_ip> 
   Port 61000
   User bastion
   IdentityFile ~/.ssh/id_ed25519
   IdentitiesOnly yes
-  LocalForward 127.0.0.1:15432 <db_private_host>:5432
+  LocalForward 127.0.0.1:15432 <db_private_host>:5432 
   ExitOnForwardFailure yes
   ServerAliveInterval 30
 ```
@@ -190,6 +191,12 @@ cd ../ansible
 ```
 
 Then connect to the server through the bastion: `ssh -J bastion@<gateway_public_ip>:61000 ubuntu@<app_server_private_ip>`.
+
+## Optional: no gateway or no load balancer (cost saving)
+
+`create_public_gateway` and `create_load_balancer` (both `true` by default) can be set to `false` per environment. The dev example keeps the gateway and turns the load balancer off. Effects, existing deployments and the rehearsal tip: "Optional Public Gateway and load balancer" in [`../README.md`](../README.md).
+
+Without the load balancer, in step 10 test through the server instead: `curl -I http://<app_server_public_ipv4>` (allow your IP on ports 80/443 in the Ansible variable `base_lb_source_cidrs`). Without the gateway, steps 6 and 8 use the server's public IP: `./tf.sh dev output -raw db_ssh_tunnel_hint`.
 
 ## 9. Optional: HTTPS certificate on the load balancer
 

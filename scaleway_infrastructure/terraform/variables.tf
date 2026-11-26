@@ -55,6 +55,27 @@ variable "private_network_cidr" {
   }
 }
 
+variable "create_public_gateway" {
+  description = <<-EOT
+    Create the Public Gateway (SSH bastion and NAT). Billed per hour (about 23 EUR/month).
+    false = no bastion: reach the database and the servers through the app server's public IP instead
+    (SSH allowed only from your admin IPs). Whether the Private Network address assignment (DHCP) works
+    without a gateway is not verified: use network_use_dhcp=false with a static address if it does not.
+  EOT
+  type        = bool
+  default     = true
+}
+
+variable "create_load_balancer" {
+  description = <<-EOT
+    Create the load balancer, its public IP, backends, frontends and certificate. Billed per hour (about
+    20 EUR/month). false = no public entry point through the load balancer: test the app through the
+    server's public IP (open ports 80/443 to your admin IPs in the host firewall). Incompatible with lb_domain_names.
+  EOT
+  type        = bool
+  default     = true
+}
+
 variable "gateway_type" {
   description = "Public Gateway type."
   type        = string
@@ -157,6 +178,11 @@ variable "lb_domain_names" {
   EOT
   type        = list(string)
   default     = []
+
+  validation {
+    condition     = length(var.lb_domain_names) == 0 || var.create_load_balancer
+    error_message = "lb_domain_names needs the load balancer: set create_load_balancer = true or empty lb_domain_names."
+  }
 
   validation {
     condition = alltrue([

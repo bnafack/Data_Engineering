@@ -139,6 +139,34 @@ Host proposal7-app
 
 Then `ssh proposal7-app` and, in another terminal, `psql -h 127.0.0.1 -U app_user app`. The output `db_ssh_tunnel_hint` prints the equivalent command. Passwords: `terraform output -raw db_app_password` / `db_admin_password`.
 
+## Optional Public Gateway and load balancer
+
+Both are billed per hour and can be switched off per environment:
+
+| Variable | Default | Dev example | Prod example | About (Paris prices) |
+|---|---|---|---|---|
+| `create_public_gateway` | `true` | `true` | `true` | 23 EUR/month (gateway S + IP) |
+| `create_load_balancer` | `true` | `false` | `true` | 20 EUR/month (LB-S + IP) |
+
+What changes when they are off:
+
+| | `create_public_gateway = false` | `create_load_balancer = false` |
+|---|---|---|
+| Bastion (`bastion@<gateway>:61000`) | gone: `gateway_public_ip`, `bastion_ssh_command`, `db_bastion_tunnel_hint` are `null` | not affected |
+| Database access | through the app server only: `db_ssh_tunnel_hint` uses the server's public IP | not affected |
+| SSH to the servers | over their public IP, so the host firewall must allow your admin IPs (`admin_cidrs`) | not affected |
+| Internet access of the servers | unchanged: the `network` role keeps the public default route, so the gateway NAT is not used | not affected |
+| App traffic | not affected | no public entry point: test through the server's public IP, open 80/443 to your admin IPs (`base_lb_source_cidrs`) |
+| Certificate | not affected | not available (`lb_domain_names` must be empty, a validation enforces it) |
+
+Recommended: keep the gateway in dev (it is the only way to reach the private database without a server, and it lets you practise the prod access model) and turn the load balancer off. Before an important prod change, set `create_load_balancer = true` in dev for a day to rehearse the health check, the 80/443 firewall rule and the certificate (about 0.70 EUR/day), then turn it off again.
+
+Notes:
+- Turning a resource off destroys it. The public IP is lost, so update DNS (load balancer) or your SSH config (gateway) when you turn it back on.
+- Existing deployments: `moved.tf` keeps the existing gateway, load balancer and their IPs when this option is introduced. The first plan should only show "has moved to ...", not a destroy. If you see a destroy of the gateway or load balancer, stop and check.
+- Not verified: whether the Private Network address assignment (DHCP) works without a gateway. If it does not, use `network_use_dhcp: false` and `network_static_address` in Ansible.
+- Not tested against a real deployment: only validated offline.
+
 ## Load balancer certificate (optional)
 
 By default the load balancer is a TCP pass-through on 80/443, and TLS is handled on the app server. Set `lb_domain_names` to let the load balancer terminate TLS with a free Let's Encrypt certificate instead.

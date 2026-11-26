@@ -22,14 +22,19 @@ resource "scaleway_iam_ssh_key" "admin" {
   public_key = each.value
 }
 
+# Public Gateway with the SSH bastion. Optional (create_public_gateway), e.g. off in dev to save about 23 EUR/month.
 resource "scaleway_vpc_public_gateway_ip" "gw" {
+  count = var.create_public_gateway ? 1 : 0
+
   tags = var.tags
 }
 
 resource "scaleway_vpc_public_gateway" "gw" {
+  count = var.create_public_gateway ? 1 : 0
+
   name              = "${var.name_prefix}-gw"
   type              = var.gateway_type
-  ip_id             = scaleway_vpc_public_gateway_ip.gw.id
+  ip_id             = scaleway_vpc_public_gateway_ip.gw[0].id
   bastion_enabled   = true
   bastion_port      = var.bastion_port
   allowed_ip_ranges = var.bastion_allowed_cidrs
@@ -47,7 +52,9 @@ resource "scaleway_vpc_public_gateway" "gw" {
 }
 
 resource "scaleway_vpc_gateway_network" "gw" {
-  gateway_id         = scaleway_vpc_public_gateway.gw.id
+  count = var.create_public_gateway ? 1 : 0
+
+  gateway_id         = scaleway_vpc_public_gateway.gw[0].id
   private_network_id = scaleway_vpc_private_network.main.id
   enable_masquerade  = true
 

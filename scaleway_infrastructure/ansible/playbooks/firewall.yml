@@ -1,0 +1,16 @@
+---
+# SIMPLE PATH, step 2: close the public IP with a host firewall (ufw).
+#
+#   ./run.sh dev firewall            # needs the inventory in bastion mode (./gen-inventory.sh dev --mode bastion --force)
+#
+# Settings (all optional, in inventories/<env>/group_vars/all/main.yml):
+#   firewall_ssh_from, firewall_allow, firewall_enable, firewall_reset   see roles/firewall/defaults/main.yml
+# Step by step: ../SIMPLE.md
+- name: Host firewall
+  hosts: servers
+  become: true
+  gather_facts: true
+  any_errors_fatal: true
+  roles:
+    - role: firewall
+      tags: [firewall]

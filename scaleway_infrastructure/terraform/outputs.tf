@@ -4,8 +4,8 @@ output "private_network_id" {
 }
 
 output "gateway_public_ip" {
-  description = "Public Gateway IP (SSH bastion host)."
-  value       = scaleway_vpc_public_gateway_ip.gw.address
+  description = "Public Gateway IP (SSH bastion host). Null without create_public_gateway."
+  value       = one(scaleway_vpc_public_gateway_ip.gw[*].address)
 }
 
 output "bastion_ssh_port" {
@@ -14,8 +14,8 @@ output "bastion_ssh_port" {
 }
 
 output "bastion_ssh_command" {
-  description = "SSH command to reach the app server through the bastion."
-  value       = local.app_private_ip == null ? null : "ssh -J bastion@${scaleway_vpc_public_gateway_ip.gw.address}:${var.bastion_port} ${var.server_ssh_user}@${local.app_private_ip}"
+  description = "SSH command to reach the app server through the bastion. Null without the gateway or the app server."
+  value       = local.app_private_ip == null || !var.create_public_gateway ? null : "ssh -J bastion@${scaleway_vpc_public_gateway_ip.gw[0].address}:${var.bastion_port} ${var.server_ssh_user}@${local.app_private_ip}"
 }
 
 output "app_server_private_ip" {
@@ -34,8 +34,8 @@ output "app_server_public_ipv4" {
 }
 
 output "lb_mode" {
-  description = "tls-on-lb (Let's Encrypt certificate on the load balancer) or tcp-passthrough (TLS on the app server)."
-  value       = local.lb_tls_enabled ? "tls-on-lb" : "tcp-passthrough"
+  description = "none (no load balancer), tls-on-lb (Let's Encrypt certificate on the load balancer) or tcp-passthrough (TLS on the app server)."
+  value       = !local.lb_enabled ? "none" : (local.lb_tls_enabled ? "tls-on-lb" : "tcp-passthrough")
 }
 
 output "lb_certificate_id" {
@@ -45,12 +45,12 @@ output "lb_certificate_id" {
 
 output "lb_dns_records_hint" {
   description = "DNS records to create at your DNS provider (LWS) BEFORE adding lb_domain_names."
-  value       = [for d in var.lb_domain_names : "${d}. A ${scaleway_lb_ip.lb.ip_address}"]
+  value       = local.lb_enabled ? [for d in var.lb_domain_names : "${d}. A ${scaleway_lb_ip.lb[0].ip_address}"] : []
 }
 
 output "lb_public_ip" {
-  description = "Public IP of the load balancer (point DNS here)."
-  value       = scaleway_lb_ip.lb.ip_address
+  description = "Public IP of the load balancer (point DNS here). Null without create_load_balancer."
+  value       = one(scaleway_lb_ip.lb[*].ip_address)
 }
 
 output "db_private_host" {
@@ -86,8 +86,17 @@ output "db_admin_password" {
 }
 
 output "db_ssh_tunnel_hint" {
-  description = "SSH tunnel for database inspection through the bastion and the app server."
-  value       = local.app_private_ip == null ? null : "ssh -J bastion@${scaleway_vpc_public_gateway_ip.gw.address}:${var.bastion_port} -L 5432:${scaleway_rdb_instance.main.private_network[0].ip}:${scaleway_rdb_instance.main.private_network[0].port} ${var.server_ssh_user}@${local.app_private_ip}"
+  description = "SSH tunnel for database inspection through the app server: via the bastion, or via the server's public IP without a gateway."
+  value = local.app_private_ip == null ? null : (
+    var.create_public_gateway
+    ? "ssh -N -J bastion@${scaleway_vpc_public_gateway_ip.gw[0].address}:${var.bastion_port} -L 127.0.0.1:15432:${scaleway_rdb_instance.main.private_network[0].ip}:${scaleway_rdb_instance.main.private_network[0].port} ${var.server_ssh_user}@${local.app_private_ip}"
+    : "ssh -N -L 127.0.0.1:15432:${scaleway_rdb_instance.main.private_network[0].ip}:${scaleway_rdb_instance.main.private_network[0].port} ${var.server_ssh_user}@${try(scaleway_baremetal_server.app[0].ipv4[0].address, "<app_server_public_ipv4>")}"
+  )
+}
+
+output "db_bastion_tunnel_hint" {
+  description = "SSH tunnel to the database through the bastion only, no server involved. Null without create_public_gateway."
+  value       = var.create_public_gateway ? "ssh -N -p ${var.bastion_port} -L 127.0.0.1:15432:${scaleway_rdb_instance.main.private_network[0].ip}:${scaleway_rdb_instance.main.private_network[0].port} bastion@${scaleway_vpc_public_gateway_ip.gw[0].address}" : null
 }
 
 output "registry_endpoint" {
