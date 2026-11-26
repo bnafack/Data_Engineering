@@ -1,0 +1,32 @@
+---
+# SIMPLE PATH: Private Network interface + Docker, nothing else.
+# No firewall, no k3s, no vault, no Terraform-generated variables needed.
+#
+#   ./run.sh dev setup                  # network, then Docker
+#   ./run.sh dev setup --tags network   # only the Private Network interface
+#   ./run.sh dev setup --tags docker    # only Docker
+#
+# Each host needs `private_vlan` and `private_ip` in the inventory (gen-inventory.sh writes them).
+# Step by step: ../SIMPLE.md
+- name: Private Network and Docker
+  hosts: servers
+  become: true
+  gather_facts: true
+  any_errors_fatal: true
+  vars:
+    # The SSH user can run docker without sudo (members of the docker group are root-equivalent).
+    docker_users: ["{{ ansible_user }}"]
+  tasks:
+    - name: Private Network VLAN interface
+      ansible.builtin.include_role:
+        name: network
+        apply:
+          tags: [network]
+      tags: [network]
+
+    - name: Docker Engine
+      ansible.builtin.include_role:
+        name: docker
+        apply:
+          tags: [docker]
+      tags: [docker]

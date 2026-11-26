@@ -1,0 +1,73 @@
+---
+# Input checks and the lockout guard. Nothing is changed here.
+- name: Check who may use SSH
+  ansible.builtin.assert:
+    that:
+      - firewall_ssh_from | length > 0
+      - firewall_ssh_from | select('equalto', '') | list | length == 0
+      - firewall_ssh_port | int > 0
+    fail_msg: >-
+      firewall_ssh_from must list at least one CIDR. The default is the Private Network range
+      (private_network_cidr): if it is missing, run ./gen-inventory.sh to create terraform.yml.
+    quiet: true
+
+- name: Check the extra ports
+  ansible.builtin.assert:
+    that:
+      - firewall_allow | rejectattr('port', 'defined') | list | length == 0
+    fail_msg: "Every firewall_allow item needs a port, for example { port: 80, src: 172.16.64.0/22 }."
+    quiet: true
+
+- name: Read the SSH connection of this session (client address)
+  ansible.builtin.command: printenv SSH_CONNECTION
+  become: false
+  register: firewall_ssh_conn
+  changed_when: false
+  failed_when: false
+  check_mode: false
+  when: firewall_check_ssh_source | bool
+
+- name: Remember the address Ansible connects from
+  ansible.builtin.set_fact:
+    firewall_ssh_client: >-
+      {{ firewall_ssh_conn.stdout.split()[0]
+         if (firewall_ssh_conn.rc | default(1)) == 0 and (firewall_ssh_conn.stdout | trim | length > 0)
+         else '' }}
+  when: firewall_check_ssh_source | bool
+
+- name: Check that the firewall will not block this very connection
+  ansible.builtin.command:
+    argv: "{{ ['python3', '-c', firewall_source_check_code, firewall_ssh_client] + firewall_ssh_from }}"
+  register: firewall_source_allowed
+  changed_when: false
+  check_mode: false
+  when:
+    - firewall_check_ssh_source | bool
+    - firewall_ssh_client | length > 0
+  vars:
+    firewall_source_check_code: |
+      import ipaddress, sys
+      client = ipaddress.ip_address(sys.argv[1])
+      print("yes" if any(client in ipaddress.ip_network(c, strict=False) for c in sys.argv[2:]) else "no")
+
+- name: Refuse to cut the connection Ansible is using
+  ansible.builtin.assert:
+    that:
+      - firewall_source_allowed.stdout | trim == 'yes'
+    fail_msg: >-
+      This SSH session comes from {{ firewall_ssh_client }}, which firewall_ssh_from
+      ({{ firewall_ssh_from | join(', ') }}) would block. Switch to the bastion first
+      (./gen-inventory.sh <env> --mode bastion --force), or add
+      {{ firewall_ssh_client }}{{ '/128' if ':' in firewall_ssh_client else '/32' }} to firewall_ssh_from.
+      Nothing was changed.
+    quiet: true
+  when:
+    - firewall_check_ssh_source | bool
+    - firewall_source_allowed is not skipped
+
+- name: Warn when the connection source could not be checked
+  ansible.builtin.debug:
+    msg: "Could not read SSH_CONNECTION: the lockout check was skipped. The rollback timer still protects the first enable."
+  when:
+    - firewall_check_ssh_source | bool
+    - firewall_source_allowed is skipped

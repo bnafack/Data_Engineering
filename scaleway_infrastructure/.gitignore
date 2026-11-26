@@ -38,5 +38,6 @@ ansible/.vault_pass
 ansible/.vault_pass.*
 ansible/fetched/
 ansible/.ansible/
+ansible/.venv/
 *.retry
 *.kubeconfig

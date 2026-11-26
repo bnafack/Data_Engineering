@@ -1,0 +1,12 @@
+---
+galaxy_info:
+  author: infrastructure
+  description: Simple ufw host firewall, with SSH from chosen CIDRs, a list of extra ports and lockout protection.
+  license: MIT
+  min_ansible_version: "2.17"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - all
+  galaxy_tags: []
+dependencies: []

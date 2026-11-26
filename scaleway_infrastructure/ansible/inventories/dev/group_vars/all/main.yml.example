@@ -22,6 +22,17 @@ network_configure: true
 # NOT the kernel name (eno1). Empty = auto-detect by MAC.
 network_parent_interface: ""
 
+# Simple firewall (./run.sh dev firewall). Defaults: SSH only from the Private Network (= through the
+# bastion), everything else denied. Uncomment to change.
+# firewall_ssh_from:                  # who may use SSH
+#   - 172.16.64.0/22              # the Private Network (bastion)
+#   - 203.0.113.10/32                 # your own address, to also allow SSH on the public IP
+# firewall_allow:                     # extra open ports (src defaults to the Private Network)
+#   - { port: 80,   src: 172.16.64.0/22, comment: load balancer }
+#   - { port: 443,  src: 172.16.64.0/22, comment: load balancer }
+#   - { port: 8080, src: 203.0.113.10/32, comment: test from home }
+# firewall_reset: false               # true = delete all existing rules first (also those added by k3s)
+
 docker_enabled: true
 
 # k3s (app server only). Exact version, never "latest". Upgrade by changing it.

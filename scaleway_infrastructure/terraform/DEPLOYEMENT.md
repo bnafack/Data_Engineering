@@ -51,6 +51,7 @@ export SCW_SECRET_KEY=...
 export SCW_DEFAULT_ORGANIZATION_ID=...
 unset SCW_DEFAULT_PROJECT_ID     # the project comes from project_id in envs/<env>.tfvars
 
+
 # Only for the remote S3 state backend (step 3, option A):
 export AWS_ACCESS_KEY_ID="$SCW_ACCESS_KEY"
 export AWS_SECRET_ACCESS_KEY="$SCW_SECRET_KEY"
@@ -137,12 +138,12 @@ Add to `~/.ssh/config` (use the private key matching one of `ssh_public_keys`):
 
 ```
 Host dev-db
-  HostName <gateway_public_ip>
+  HostName <gateway_public_ip> 
   Port 61000
   User bastion
   IdentityFile ~/.ssh/id_ed25519
   IdentitiesOnly yes
-  LocalForward 127.0.0.1:15432 <db_private_host>:5432
+  LocalForward 127.0.0.1:15432 <db_private_host>:5432 
   ExitOnForwardFailure yes
   ServerAliveInterval 30
 ```
